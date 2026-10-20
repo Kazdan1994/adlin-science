@@ -39,10 +39,3 @@ Bonus:
 - Pouvoir filtrer les salles de réunions via des filtres (équipements,
   capacité) - Animations lors d'une réservation, Un design pas trop moche ;)
 ```
-<br />
-Fais de ton mieux ;)
-
-
-**Adlin-science**
-
-
