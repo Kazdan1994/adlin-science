@@ -33,6 +33,5 @@
 
 - Passed on first validation pass. `salles.json` is named only as the supplied data source,
   not as an implementation choice.
-- Open governance issue (not a spec defect): the constitution's Principle I now persists
-  bookings to MongoDB only, while Principle III still requires a `.json` mirror and the Adlin
-  brief requires a `.json` file. Resolve before `/speckit-plan`.
+- Storage resolved 2026-10-20: all persistence is in MongoDB, no JSON file (constitution
+  v2.0.0). This deliberately departs from the brief's `.json` requirement.

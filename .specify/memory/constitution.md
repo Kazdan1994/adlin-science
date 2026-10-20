@@ -1,15 +1,16 @@
 <!--
 Sync Impact Report
-- Version change: (unfilled template) → 1.0.0
-- Principles defined (all new):
-  - I. Brief Compliance (NON-NEGOTIABLE)
-  - II. Security by Default
-  - III. Booking Integrity
-  - IV. Test-First Core
-  - V. Ease of Use
-- Added sections: Technical Constraints & Stack; Development Workflow & Quality Gates; Governance
+- Version change: 1.0.0 → 2.0.0 (MAJOR: storage and time zone rules redefined)
+- Modified principles (titles unchanged):
+  - I. Brief Compliance: bookings persist to MongoDB instead of a `.json` file (owner edit,
+    committed in 6e855f4 without a version bump; recorded here)
+  - III. Booking Integrity: `.json` mirror removed from the confirmation rule; times now use the
+    office time zone (Europe/Paris) instead of the user's device time zone
+- Technical Constraints: local-run line reworded (Docker Compose), no semantic change
+- Added sections: none
 - Removed sections: none
 - Templates: not modified (plan/spec/tasks templates read this file at runtime)
+- Deferred TODOs: none
 -->
 
 # Adlin Meeting Room Booking Constitution
@@ -62,12 +63,14 @@ A booking system is only useful if it never double-books.
 - The conflict check and the insert MUST be atomic with respect to concurrent requests. Two
   simultaneous requests for an overlapping slot on the same room result in exactly one success
   and one `409 Conflict`.
-- Timestamps are stored and exchanged as ISO 8601 in UTC. The UI converts to and from the
-  user's local time and shows the time zone it uses.
+- Timestamps are stored and exchanged as ISO 8601 in UTC. All rooms are in one office, so the
+  UI enters and displays every time in the office time zone (Europe/Paris), whatever the
+  user's device setting, and labels it on the page. "In the past" is judged against current
+  office time.
 - The API MUST reject bookings with `end <= start`, bookings in the past, and requests
   referencing a room that does not exist in `salles.json`.
-- A booking is reported as confirmed to the client only after it is durably written to both
-  MongoDB and the `.json` mirror.
+- A booking is reported as confirmed to the client only after it is durably written to
+  MongoDB.
 
 Rationale: availability correctness is the core feature. Interval semantics and concurrency
 rules are fixed here so specs and plans do not reinvent them.
@@ -114,7 +117,7 @@ missing features.
 - **Booking storage**: MongoDB is the primary store and source of truth for availability
   queries and conflict checks.
 - **Local run**: a fresh clone MUST start the full stack (API, UI, MongoDB) with one documented
-  command (use docker-compose)
+  command, using Docker Compose.
 - **Scope**: in scope are equipment/capacity filters, a polished design with booking
   animations, and MongoDB storage. A hosted deployment is out of scope unless this
   constitution is amended.
@@ -145,4 +148,4 @@ holds runtime guidance for agents and MUST stay consistent with it.
   Any deviation is recorded in the plan's Complexity Tracking with the reason a compliant
   approach was rejected.
 
-**Version**: 1.0.0 | **Ratified**: 2026-10-20 | **Last Amended**: 2026-10-20
+**Version**: 2.0.0 | **Ratified**: 2026-10-20 | **Last Amended**: 2026-10-20

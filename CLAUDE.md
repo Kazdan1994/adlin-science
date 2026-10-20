@@ -17,12 +17,16 @@ Hard requirements:
 - Backend: Node.js + Express.
 - Frontend: Vue.js / Nuxt.js.
 - Fetching rooms and making bookings goes through REST APIs called via AJAX.
-- Bookings persist to a `.json` file (format is free).
 - A room booked for a given date/time must not appear in a later search for the same date/time.
 - Reviewers weigh ease of use and security most heavily.
 
-Room data comes from `salles.json`, supplied as an attachment. It is **not in the repo yet**; get it from
-the user rather than guessing its schema.
+Persistence: the brief asks for bookings in a `.json` file. The project owner chose to deviate from
+that: **all persistence goes to MongoDB, never to a JSON file** (constitution v2.0.0, Principle I).
+Don't reintroduce a JSON store or mirror.
+
+Room data comes from `salles.json` at the repo root (5 rooms; fields `name`, `description`, `capacity`,
+`equipements[].name`, `createdAt`, `updatedAt`; no ID field, so `name` is the identifier). It is the
+read-only source of rooms.
 
 Bonus: hosted version, MongoDB for bookings, equipment/capacity filters, booking animations, decent design.
 
