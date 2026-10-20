@@ -10,6 +10,19 @@
 exclude booked rooms from later searches for the same slot." (Derived from the Adlin brief in
 `README.md`; the command was invoked without arguments.)
 
+## Clarifications
+
+### Session 2026-10-20
+
+- Q: Should a user be able to cancel a booking they just made? → A: No. Confirmed bookings are
+  final; cancellation and editing are out of scope.
+- Q: Should booking times be in the office's time zone or each user's device time zone? → A:
+  Office time zone (Europe/Paris) for everyone, labelled on the page.
+- Q: What should the page show when it first opens, before the user has searched? → A: Form
+  pre-filled with the next 15-minute slot today, lasting 1 hour, with free rooms for it listed.
+- Q: Should bookings be limited to office opening hours, or allowed at any time of day? → A: Any
+  time of day, every day; no opening-hours restriction.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Find a free room for a time slot and book it (Priority: P1)
@@ -40,6 +53,8 @@ search the same slot again and confirm the booked room is absent while the other
    2026-11-03 11:00–12:00, **Then** "Salle #2" is listed (back-to-back slots do not overlap).
 6. **Given** a booking was confirmed, **When** the service is restarted, **Then** a search for
    the same slot still excludes the booked room.
+7. **Given** it is 2026-11-03 09:07 office time and no bookings exist, **When** a user opens the
+   page, **Then** the form shows 2026-11-03 09:15–10:15 and all five rooms are already listed.
 
 ---
 
@@ -116,8 +131,10 @@ verify one confirmation and one clear "just taken" message followed by refreshed
   with a "too many attempts, try again shortly" message.
 - Booking service unreachable while searching or booking: the user sees a plain-language error
   with a retry action; no booking is shown as confirmed unless it was saved.
-- Daylight saving change day: times shown and stored stay consistent with the user's local
-  clock; a 10:00–11:00 booking is still one hour.
+- Daylight saving change day: times stay consistent with the office clock (Europe/Paris); a
+  10:00–11:00 booking is still one hour.
+- User's device set to another time zone: times are still entered and shown in office time, so
+  "10:00" means 10:00 in Paris for every user.
 
 ## Requirements *(mandatory)*
 
@@ -126,7 +143,9 @@ verify one confirmation and one clear "just taken" message followed by refreshed
 **Search**
 
 - **FR-001**: System MUST let a user search by date, start time and end time; all three are
-  required.
+  required. On first load the form MUST be pre-filled with the next 15-minute boundary in
+  office time and a 1-hour duration, and the free rooms for that slot MUST already be listed.
+  If that default slot would cross midnight, the default becomes tomorrow 09:00–10:00.
 - **FR-002**: System MUST list as available only catalogue rooms with no confirmed booking
   overlapping the searched slot. Slots are start-inclusive and end-exclusive, so a booking
   ending at 11:00 does not block a slot starting at 11:00.
@@ -144,6 +163,7 @@ verify one confirmation and one clear "just taken" message followed by refreshed
   name (1–80 characters after trimming) and confirming.
 - **FR-008**: System MUST refuse a booking whose slot is invalid: end not after start, start in
   the past, times off the 15-minute grid, slot crossing midnight, or date beyond 90 days ahead.
+  There is no opening-hours restriction: any slot within 00:00–24:00 on one day is valid.
 - **FR-009**: System MUST refuse a booking for a room that does not exist in the catalogue.
 - **FR-010**: System MUST NEVER hold two confirmed bookings for the same room with overlapping
   slots, including when requests arrive simultaneously; exactly one such request succeeds.
@@ -158,8 +178,9 @@ verify one confirmation and one clear "just taken" message followed by refreshed
 **Experience and safety**
 
 - **FR-014**: Searching and booking MUST happen on a single page without a full page reload.
-- **FR-015**: Times MUST be entered and displayed in the user's local time zone, and the page
-  MUST state which time zone it uses.
+- **FR-015**: Times MUST be entered and displayed in the office time zone (Europe/Paris) for every
+  user, whatever their device setting, and the page MUST label it (e.g. "Paris time"). "In the
+  past" (FR-008) is judged against the current office time.
 - **FR-016**: Every error shown to the user MUST name the problem and the next step in plain
   language; field errors appear next to the field concerned.
 - **FR-017**: System MUST validate every search and booking input, reject anything malformed or
@@ -170,6 +191,8 @@ verify one confirmation and one clear "just taken" message followed by refreshed
 - **FR-019**: All flows MUST be operable by keyboard alone, meet WCAG 2.1 AA contrast and remain
   usable at a 360-pixel-wide viewport.
 - **FR-020**: The app MUST NOT require or offer any account, sign-up or login.
+- **FR-021**: Confirmed bookings MUST be final: the app MUST NOT offer any way to cancel or edit
+  a booking, and the confirmation MUST say so.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -212,11 +235,9 @@ verify one confirmation and one clear "just taken" message followed by refreshed
   90 days ahead. Any hour of the day is bookable; the brief sets no opening hours.
 - The only booker detail collected is a name. No email or contact information is gathered, to
   keep personal data to a minimum.
-- Cancelling, editing and listing existing bookings are out of scope: with no accounts, there is
-  no safe way to restrict who may change a booking.
-- All users share one office and see times in their device's local time zone.
+- Cancelling, editing and listing existing bookings are out of scope (see FR-021): with no
+  accounts, there is no safe way to restrict who may change a booking.
+- All rooms are in one office in the Europe/Paris time zone.
 - Interface copy is in English.
 - How and where bookings are stored is decided in the plan, within the project constitution.
-  The Adlin brief requires bookings to be saved in a `.json` file; that requirement carries into
-  planning.
 - A hosted deployment is out of scope for this feature, per the constitution.
