@@ -1,0 +1,260 @@
+openapi: 3.1.0
+info:
+  title: Adlin Meeting Room Booking API
+  version: 1.0.0
+  description: >
+    REST API called by the web app over AJAX. No authentication. All instants are ISO 8601 UTC
+    strings on the 15-minute grid. Office calendar rules (same-day slot, 90-day horizon) use
+    Europe/Paris. Unknown query parameters and body fields are rejected with 400.
+servers:
+  - url: http://localhost:4000/api
+paths:
+  /health:
+    get:
+      summary: Liveness and database connectivity
+      operationId: getHealth
+      responses:
+        '200':
+          description: API is up and MongoDB is reachable
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [status]
+                properties:
+                  status: { const: ok }
+        '503':
+          $ref: '#/components/responses/Error'
+
+  /rooms:
+    get:
+      summary: Full room catalogue (used to build the equipment filter)
+      operationId: listRooms
+      responses:
+        '200':
+          description: All rooms, sorted by capacity then name
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [rooms, equipment]
+                properties:
+                  rooms:
+                    type: array
+                    items: { $ref: '#/components/schemas/Room' }
+                  equipment:
+                    description: Distinct equipment names across all rooms, sorted
+                    type: array
+                    items: { type: string }
+              example:
+                rooms:
+                  - { slug: salle-1, name: 'Salle #1', description: 'Salle #1', capacity: 5, equipment: [TV, Retro Projecteur] }
+                equipment: [Retro Projecteur, TV]
+        '429':
+          $ref: '#/components/responses/Error'
+
+  /rooms/available:
+    get:
+      summary: Rooms free for the whole slot, optionally filtered
+      operationId: listAvailableRooms
+      parameters:
+        - name: start
+          in: query
+          required: true
+          schema: { $ref: '#/components/schemas/Instant' }
+        - name: end
+          in: query
+          required: true
+          schema: { $ref: '#/components/schemas/Instant' }
+        - name: minCapacity
+          in: query
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 1000 }
+        - name: equipment
+          in: query
+          required: false
+          description: Repeat the parameter for several items. A room must have all of them.
+          style: form
+          explode: true
+          schema:
+            type: array
+            maxItems: 10
+            uniqueItems: true
+            items: { type: string, minLength: 1, maxLength: 50 }
+      responses:
+        '200':
+          description: Available rooms (possibly empty), sorted by capacity then name
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [rooms]
+                properties:
+                  rooms:
+                    type: array
+                    items: { $ref: '#/components/schemas/Room' }
+        '400':
+          description: >
+            VALIDATION_ERROR (bad/missing slot, past, off-grid, crosses midnight, beyond 90 days,
+            bad capacity, unknown parameter) or UNKNOWN_EQUIPMENT
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+        '429':
+          $ref: '#/components/responses/Error'
+
+  /bookings:
+    post:
+      summary: Book a room for a slot
+      operationId: createBooking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateBookingRequest' }
+            example:
+              roomSlug: salle-2
+              start: '2026-11-03T09:00:00.000Z'
+              end: '2026-11-03T10:00:00.000Z'
+              bookerName: Alice Martin
+      responses:
+        '201':
+          description: Booking durably saved
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [booking]
+                properties:
+                  booking: { $ref: '#/components/schemas/Booking' }
+        '400':
+          description: VALIDATION_ERROR (slot rules, bookerName rules, unknown field, malformed JSON)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+        '404':
+          description: ROOM_NOT_FOUND
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+        '409':
+          description: SLOT_TAKEN (another booking of this room overlaps the slot)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+        '413':
+          description: PAYLOAD_TOO_LARGE (body over 10 kB)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+        '415':
+          description: UNSUPPORTED_MEDIA_TYPE (body is not application/json)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+        '429':
+          description: RATE_LIMITED (more than 10 booking attempts per minute from this client)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+
+components:
+  schemas:
+    Instant:
+      type: string
+      format: date-time
+      description: UTC instant ending in Z, minutes multiple of 15, zero seconds and milliseconds
+      examples: ['2026-11-03T09:15:00.000Z']
+
+    Room:
+      type: object
+      additionalProperties: false
+      required: [slug, name, description, capacity, equipment]
+      properties:
+        slug: { type: string, pattern: '^[a-z0-9-]{1,64}$' }
+        name: { type: string }
+        description: { type: string }
+        capacity: { type: integer, minimum: 1 }
+        equipment:
+          type: array
+          items: { type: string }
+
+    CreateBookingRequest:
+      type: object
+      additionalProperties: false
+      required: [roomSlug, start, end, bookerName]
+      properties:
+        roomSlug: { type: string, pattern: '^[a-z0-9-]{1,64}$' }
+        start: { $ref: '#/components/schemas/Instant' }
+        end: { $ref: '#/components/schemas/Instant' }
+        bookerName:
+          type: string
+          description: Trimmed server-side; 1–80 characters after trimming; no control characters
+          minLength: 1
+          maxLength: 200
+
+    Booking:
+      type: object
+      additionalProperties: false
+      required: [id, room, start, end, bookerName, createdAt]
+      properties:
+        id: { type: string, pattern: '^[a-f0-9]{24}$' }
+        room:
+          type: object
+          additionalProperties: false
+          required: [slug, name]
+          properties:
+            slug: { type: string }
+            name: { type: string }
+        start: { $ref: '#/components/schemas/Instant' }
+        end: { $ref: '#/components/schemas/Instant' }
+        bookerName: { type: string }
+        createdAt: { type: string, format: date-time }
+
+    ErrorEnvelope:
+      type: object
+      additionalProperties: false
+      required: [error]
+      properties:
+        error:
+          type: object
+          additionalProperties: false
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              enum:
+                - VALIDATION_ERROR
+                - UNKNOWN_EQUIPMENT
+                - ROOM_NOT_FOUND
+                - SLOT_TAKEN
+                - PAYLOAD_TOO_LARGE
+                - UNSUPPORTED_MEDIA_TYPE
+                - RATE_LIMITED
+                - NOT_FOUND
+                - SERVICE_UNAVAILABLE
+                - INTERNAL_ERROR
+            message:
+              type: string
+              description: Plain-language, safe to show; never contains internals
+            fields:
+              type: object
+              description: Per-field messages for VALIDATION_ERROR, keyed by field name
+              additionalProperties: { type: string }
+      example:
+        error:
+          code: VALIDATION_ERROR
+          message: Some details need fixing.
+          fields:
+            end: End time must be after the start time.
+
+  responses:
+    Error:
+      description: Error envelope (RATE_LIMITED, SERVICE_UNAVAILABLE, INTERNAL_ERROR)
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
