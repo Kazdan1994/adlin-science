@@ -27,7 +27,7 @@ Shared: `zod` 4, `date-fns` 4, `@date-fns/tz`.
 file persistence.
 
 **Testing**: Vitest 5 (unit + API contract), Supertest 7, `mongodb-memory-server` 11, Playwright
-1.64 (end-to-end)
+1.64 (end-to-end), `@axe-core/playwright` (accessibility scan)
 
 **Target Platform**: Linux containers via Docker Compose; evergreen desktop and mobile browsers
 

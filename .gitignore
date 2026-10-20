@@ -1,1 +1,8 @@
 .idea
+node_modules/
+dist/
+.output/
+.nuxt/
+.env
+playwright-report/
+test-results/
