@@ -14,6 +14,7 @@ const bookerName = ref('')
 const localNameError = ref<string | null>(null)
 const nameInput = useTemplateRef<HTMLInputElement>('nameInput')
 
+const roomFacts = computed(() => [`${props.room.capacity} seats`, ...props.room.equipment].join(' · '))
 const nameError = computed(() => localNameError.value ?? props.error?.fields?.bookerName ?? null)
 const bannerError = computed(() => (props.error && !props.error.fields?.bookerName ? props.error : null))
 
@@ -43,17 +44,18 @@ function onSubmit(): void {
   <dialog
     ref="dialog"
     :aria-labelledby="titleId"
-    class="m-auto w-[min(32rem,calc(100vw-2rem))] rounded-lg p-6 backdrop:bg-slate-900/60"
+    class="m-auto w-[min(30rem,calc(100vw-2rem))] rounded-card bg-surface p-6 text-ink shadow-[0_12px_32px_rgba(0,0,0,0.14)] backdrop:bg-ink/40"
     @close="emit('close')"
   >
-    <form novalidate class="space-y-4" @submit.prevent="onSubmit">
-      <h2 :id="titleId" class="text-xl font-semibold">Book {{ room.name }}</h2>
-      <p>
-        {{ formatDay(timeSlot.date) }}, <span class="whitespace-nowrap">{{ formatTimeRange(timeSlot.startTime, timeSlot.endTime) }}</span> <span class="text-slate-700">(Paris time)</span>
+    <form novalidate @submit.prevent="onSubmit">
+      <h2 :id="titleId" class="text-lg font-semibold">Book {{ room.name }}</h2>
+      <p class="mt-1 text-sm text-muted">
+        {{ formatDay(timeSlot.date) }}, <span class="whitespace-nowrap font-medium text-ink">{{ formatTimeRange(timeSlot.startTime, timeSlot.endTime) }}</span> (Paris time)
       </p>
+      <p class="mt-0.5 text-sm text-muted">{{ roomFacts }}</p>
 
-      <div>
-        <label :for="nameId" class="font-medium">Your name</label>
+      <div class="mt-5">
+        <label :for="nameId" class="text-sm font-medium">Your name</label>
         <input
           :id="nameId"
           ref="nameInput"
@@ -63,21 +65,21 @@ function onSubmit(): void {
           maxlength="80"
           autocomplete="name"
           autofocus
-          class="mt-1 block w-full rounded-md border border-slate-400 px-3 py-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 aria-[invalid=true]:border-red-700"
+          class="mt-1.5 block h-9 w-full rounded-control border border-control bg-surface px-3 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary aria-[invalid=true]:border-negative"
           :aria-invalid="nameError ? 'true' : undefined"
           :aria-describedby="nameError ? nameErrorId : undefined"
         >
-        <p v-if="nameError" :id="nameErrorId" class="mt-1 text-sm text-red-800">{{ nameError }}</p>
+        <p v-if="nameError" :id="nameErrorId" class="mt-1.5 text-sm text-negative">{{ nameError }}</p>
       </div>
 
-      <ErrorBanner v-if="bannerError" :code="bannerError.code" />
+      <ErrorBanner v-if="bannerError" :code="bannerError.code" class="mt-4" />
 
-      <p class="text-sm text-slate-700">Bookings are final and can't be changed or cancelled.</p>
+      <p class="mt-5 text-sm text-muted">Bookings are final and can't be changed or cancelled.</p>
 
-      <div class="flex justify-end gap-3">
+      <div class="mt-4 flex justify-end gap-2">
         <button
           type="button"
-          class="rounded-md border border-slate-500 px-4 py-2 font-medium hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
+          class="h-9 rounded-control border border-control bg-surface px-4 text-sm font-medium hover:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           @click="dialog?.close()"
         >
           Cancel
@@ -85,7 +87,7 @@ function onSubmit(): void {
         <button
           type="submit"
           :aria-disabled="submitting"
-          class="rounded-md bg-blue-700 px-4 py-2 font-medium text-white hover:bg-blue-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 aria-disabled:cursor-wait aria-disabled:opacity-60"
+          class="h-9 rounded-control bg-primary px-4 text-sm font-medium text-white hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary aria-disabled:cursor-wait aria-disabled:bg-primary-hover"
         >
           {{ submitting ? 'Booking…' : 'Confirm booking' }}
         </button>
