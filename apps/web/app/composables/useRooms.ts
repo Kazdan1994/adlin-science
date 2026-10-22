@@ -16,7 +16,6 @@ export function useRooms() {
       roomCount.value = catalogue.rooms.length
       status.value = 'ready'
     } catch {
-      // The equipment filter stays empty; the search reports API problems on its own.
       status.value = 'error'
     }
   })

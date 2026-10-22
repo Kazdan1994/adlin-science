@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { HORIZON_DAYS, parisTimeOf, SLOT_MINUTES } from '@adlin/shared'
 
-// The office clock: every time on the page is Paris time, so the bar shows what it is now.
 const parisNow = ref(parisTimeOf(new Date()))
 let clock: ReturnType<typeof setInterval> | undefined
 onMounted(() => {
@@ -15,7 +14,7 @@ const column = 'mx-auto w-full max-w-[1100px] px-4 sm:px-6'
 </script>
 
 <template>
-  <div class="min-h-screen bg-ground font-sans text-ink">
+  <div class="min-h-dvh bg-ground font-sans text-ink">
     <a
       href="#main"
       class="sr-only rounded-control bg-surface px-3 py-2 font-medium text-ink focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-10"

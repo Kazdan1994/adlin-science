@@ -13,7 +13,7 @@ const props = defineProps<{
   maxCapacity: number
   roomCount: number
 }>()
-defineEmits<{ book: [room: Room]; retry: []; clear: [] }>()
+defineEmits<{ book: [room: Room]; retry: []; clear: []; changeTime: [] }>()
 
 const heading = useTemplateRef<HTMLElement>('heading')
 defineExpose({ focus: () => heading.value?.focus() })
@@ -25,7 +25,6 @@ const minutesOf = (hhmm: string): number => {
 }
 const percentOfDay = (minutes: number): string => `${(minutes / DAY_MINUTES) * 100}%`
 
-// The day ruler: the searched slot on a 24-hour strip, and the current time when the slot is today.
 const slotStyle = computed(() => {
   const start = minutesOf(props.timeSlot.startTime)
   return { left: percentOfDay(start), width: percentOfDay(minutesOf(props.timeSlot.endTime) - start) }
@@ -85,7 +84,7 @@ const liveMessage = computed(() => {
       <ErrorBanner :code="error.code" retryable @retry="$emit('retry')" />
     </div>
     <div v-else-if="status === 'success' && rooms.length === 0" class="border-t border-rule p-5">
-      <EmptyState :filtered="filtered" :min-capacity="minCapacity" :max-capacity="maxCapacity" @clear="$emit('clear')" />
+      <EmptyState :filtered="filtered" :min-capacity="minCapacity" :max-capacity="maxCapacity" @clear="$emit('clear')" @change-time="$emit('changeTime')" />
     </div>
     <ul v-else-if="status === 'success'" class="border-t border-rule">
       <RoomCard v-for="room in rooms" :key="room.slug" :room="room" :max-capacity="maxCapacity" @book="$emit('book', $event)" />

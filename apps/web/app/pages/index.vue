@@ -10,10 +10,9 @@ const conflictBanner = useTemplateRef<{ focus: () => void }>('conflictBanner')
 const confirmation = useTemplateRef<{ focus: () => void }>('confirmation')
 const roomList = useTemplateRef<{ focus: () => void }>('roomList')
 const filterPanel = useTemplateRef<{ clear: () => void }>('filterPanel')
-// Layout: 12 columns with a 12px gap, search panel on 4 and results on 8, so both share the column's edges.
+const searchForm = useTemplateRef<{ focusDate: () => void }>('searchForm')
 const filtersActive = computed(() => criteria.value.minCapacity !== undefined || criteria.value.equipment.length > 0)
 
-// A conflict message only applies to the search it came from.
 watch(criteria, () => {
   conflictRoom.value = null
 })
@@ -24,7 +23,6 @@ function openDialog(room: Room): void {
   selectedRoom.value = room
 }
 
-// The confirmation unmounts, so focus moves to the refreshed list it was hiding.
 async function bookAnother(): Promise<void> {
   reset()
   await nextTick()
@@ -65,7 +63,7 @@ async function confirm(bookerName: string): Promise<void> {
 <template>
   <div class="grid grid-cols-1 items-start gap-3 lg:grid-cols-12">
     <aside aria-label="Search" class="rounded-card border border-line bg-surface p-5 lg:sticky lg:top-6 lg:col-span-4">
-      <SearchForm :criteria="criteria" @search="search" />
+      <SearchForm ref="searchForm" :criteria="criteria" @search="search" />
       <FilterPanel
         ref="filterPanel"
         :filters="criteria"
@@ -91,6 +89,7 @@ async function confirm(bookerName: string): Promise<void> {
         @book="openDialog"
         @retry="refresh"
         @clear="clearFilters"
+        @change-time="searchForm?.focusDate()"
       />
     </div>
     <BookingDialog

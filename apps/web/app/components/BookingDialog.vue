@@ -18,10 +18,8 @@ const roomFacts = computed(() => [`${props.room.capacity} seats`, ...props.room.
 const nameError = computed(() => localNameError.value ?? props.error?.fields?.bookerName ?? null)
 const bannerError = computed(() => (props.error && !props.error.fields?.bookerName ? props.error : null))
 
-// showModal() gives the focus trap, Esc to close and focus return to the "Book" button.
 onMounted(() => dialog.value?.showModal())
 
-// Focus the field so screen readers announce the error it is described by.
 watch(nameError, async (error) => {
   if (!error) return
   await nextTick()
@@ -65,7 +63,7 @@ function onSubmit(): void {
           maxlength="80"
           autocomplete="name"
           autofocus
-          class="mt-1.5 block h-9 w-full rounded-control border border-control bg-surface px-3 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary aria-[invalid=true]:border-negative"
+          class="mt-1.5 block h-11 w-full rounded-control border border-control bg-surface px-3 text-base sm:h-9 sm:text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary aria-[invalid=true]:border-negative"
           :aria-invalid="nameError ? 'true' : undefined"
           :aria-describedby="nameError ? nameErrorId : undefined"
         >

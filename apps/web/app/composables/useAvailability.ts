@@ -37,7 +37,7 @@ export function useAvailability() {
         ...(current.minCapacity !== undefined ? { minCapacity: current.minCapacity } : {}),
         ...(current.equipment.length > 0 ? { equipment: current.equipment } : {}),
       })
-      if (request !== latestRequest) return // a newer search superseded this one
+      if (request !== latestRequest) return
       rooms.value = response.rooms
       error.value = null
       status.value = 'success'

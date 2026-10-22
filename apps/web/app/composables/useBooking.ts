@@ -18,7 +18,7 @@ export function useBooking() {
   const isSubmitting = computed(() => status.value === 'submitting')
 
   async function submit(room: Room, slot: BookingSlot, bookerName: string): Promise<void> {
-    if (isSubmitting.value) return // a second click while the first request is in flight
+    if (isSubmitting.value) return
     status.value = 'submitting'
     error.value = null
     try {

@@ -28,14 +28,12 @@ const minutesOf = (hhmm: string): number => {
 }
 const toHHmm = (total: number): string =>
   `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`
-// Moving the start keeps the length the user picked, so a new start never silently stretches the slot.
 let durationMinutes = minutesOf(endTime.value) - minutesOf(startTime.value)
 const rememberDuration = (): void => {
   durationMinutes = minutesOf(endTime.value) - minutesOf(startTime.value)
 }
 
 const isDate = (value: string): boolean => /^\d{4}-\d{2}-\d{2}$/.test(value)
-// Today only offers start times that have not passed yet.
 const startOptions = computed(() => {
   if (!isDate(date.value)) return []
   const options = startTimeOptions(date.value)
@@ -47,7 +45,6 @@ const endOptions = computed(() =>
   startOptions.value.includes(startTime.value) ? endTimeOptions(date.value, startTime.value) : [],
 )
 
-// Keep the selects on times that exist for the chosen day (e.g. the spring-forward gap).
 watch(startOptions, (options) => {
   if (options.includes(startTime.value)) return
   const next = options.find((time) => time > startTime.value) ?? options[0]
@@ -59,7 +56,6 @@ watch(endOptions, (options) => {
   if (next && next !== endTime.value) endTime.value = next
 })
 
-// The results always follow the slot in the form, so it searches as soon as the slot changes.
 watch([date, startTime, endTime], onSubmit, { flush: 'post' })
 
 function onSubmit(): void {
@@ -80,8 +76,11 @@ function onSubmit(): void {
   emit('search', { date: date.value, startTime: startTime.value, endTime: endTime.value })
 }
 
+const dateInput = useTemplateRef<HTMLInputElement>('dateInput')
+defineExpose({ focusDate: () => dateInput.value?.focus() })
+
 const field =
-  'mt-1.5 block h-9 w-full rounded-control border border-control bg-surface px-3 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary aria-[invalid=true]:border-negative'
+  'mt-1.5 block h-11 w-full rounded-control border border-control bg-surface px-3 text-base sm:h-9 sm:text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary aria-[invalid=true]:border-negative'
 </script>
 
 <template>
@@ -90,7 +89,7 @@ const field =
     <div class="mt-3 grid grid-cols-2 gap-3">
       <div class="col-span-2">
         <label :for="`${id}-date`" class="text-sm font-medium">Date</label>
-        <input :id="`${id}-date`" v-model="date" type="date" :min="today" :max="maxDate" required :class="field">
+        <input :id="`${id}-date`" ref="dateInput" v-model="date" type="date" :min="today" :max="maxDate" required :class="field">
       </div>
       <div>
         <label :for="`${id}-start`" class="text-sm font-medium">Start</label>
@@ -103,7 +102,7 @@ const field =
         >
           <option v-for="time in startOptions" :key="time" :value="time">{{ time }}</option>
         </select>
-        <p v-if="errors.start" :id="`${id}-start-error`" class="mt-1.5 text-sm text-negative">{{ errors.start }}</p>
+        <p v-if="errors.start" :id="`${id}-start-error`" role="alert" class="mt-1.5 text-sm text-negative">{{ errors.start }}</p>
       </div>
       <div>
         <label :for="`${id}-end`" class="text-sm font-medium">End</label>
@@ -117,7 +116,7 @@ const field =
         >
           <option v-for="time in endOptions" :key="time" :value="time">{{ time }}</option>
         </select>
-        <p v-if="errors.end" :id="`${id}-end-error`" class="mt-1.5 text-sm text-negative">{{ errors.end }}</p>
+        <p v-if="errors.end" :id="`${id}-end-error`" role="alert" class="mt-1.5 text-sm text-negative">{{ errors.end }}</p>
       </div>
     </div>
   </form>
