@@ -12,12 +12,20 @@ const nameId = useId()
 const nameErrorId = useId()
 const bookerName = ref('')
 const localNameError = ref<string | null>(null)
+const nameInput = useTemplateRef<HTMLInputElement>('nameInput')
 
 const nameError = computed(() => localNameError.value ?? props.error?.fields?.bookerName ?? null)
 const bannerError = computed(() => (props.error && !props.error.fields?.bookerName ? props.error : null))
 
 // showModal() gives the focus trap, Esc to close and focus return to the "Book" button.
 onMounted(() => dialog.value?.showModal())
+
+// Focus the field so screen readers announce the error it is described by.
+watch(nameError, async (error) => {
+  if (!error) return
+  await nextTick()
+  nameInput.value?.focus()
+})
 
 function onSubmit(): void {
   if (props.submitting) return
@@ -34,8 +42,6 @@ function onSubmit(): void {
 <template>
   <dialog
     ref="dialog"
-    role="dialog"
-    aria-modal="true"
     :aria-labelledby="titleId"
     class="m-auto w-[min(32rem,calc(100vw-2rem))] rounded-lg p-6 backdrop:bg-slate-900/60"
     @close="emit('close')"
@@ -43,14 +49,14 @@ function onSubmit(): void {
     <form novalidate class="space-y-4" @submit.prevent="onSubmit">
       <h2 :id="titleId" class="text-xl font-semibold">Book {{ room.name }}</h2>
       <p>
-        {{ formatDay(timeSlot.date) }}, {{ formatTimeRange(timeSlot.startTime, timeSlot.endTime) }}
-        <span class="text-slate-700">(Paris time)</span>
+        {{ formatDay(timeSlot.date) }}, <span class="whitespace-nowrap">{{ formatTimeRange(timeSlot.startTime, timeSlot.endTime) }}</span> <span class="text-slate-700">(Paris time)</span>
       </p>
 
       <div>
         <label :for="nameId" class="font-medium">Your name</label>
         <input
           :id="nameId"
+          ref="nameInput"
           v-model="bookerName"
           type="text"
           required
@@ -66,6 +72,8 @@ function onSubmit(): void {
 
       <ErrorBanner v-if="bannerError" :code="bannerError.code" />
 
+      <p class="text-sm text-slate-700">Bookings are final and can't be changed or cancelled.</p>
+
       <div class="flex justify-end gap-3">
         <button
           type="button"
@@ -79,7 +87,7 @@ function onSubmit(): void {
           :aria-disabled="submitting"
           class="rounded-md bg-blue-700 px-4 py-2 font-medium text-white hover:bg-blue-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 aria-disabled:cursor-wait aria-disabled:opacity-60"
         >
-          Confirm booking
+          {{ submitting ? 'Booking…' : 'Confirm booking' }}
         </button>
       </div>
     </form>

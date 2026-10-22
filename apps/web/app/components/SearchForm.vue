@@ -10,7 +10,7 @@ import {
 } from '@adlin/shared'
 import type { SlotCriteria } from '~/composables/useAvailability'
 
-const props = defineProps<{ criteria: SlotCriteria; busy: boolean }>()
+const props = defineProps<{ criteria: SlotCriteria }>()
 const emit = defineEmits<{ search: [criteria: SlotCriteria] }>()
 
 const id = useId()
@@ -22,8 +22,27 @@ const startTime = ref(props.criteria.startTime)
 const endTime = ref(props.criteria.endTime)
 const errors = ref<{ start?: string; end?: string }>({})
 
+const minutesOf = (hhmm: string): number => {
+  const [hours = 0, minutes = 0] = hhmm.split(':').map(Number)
+  return hours * 60 + minutes
+}
+const toHHmm = (total: number): string =>
+  `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`
+// Moving the start keeps the length the user picked, so a new start never silently stretches the slot.
+let durationMinutes = minutesOf(endTime.value) - minutesOf(startTime.value)
+const rememberDuration = (): void => {
+  durationMinutes = minutesOf(endTime.value) - minutesOf(startTime.value)
+}
+
 const isDate = (value: string): boolean => /^\d{4}-\d{2}-\d{2}$/.test(value)
-const startOptions = computed(() => (isDate(date.value) ? startTimeOptions(date.value) : []))
+// Today only offers start times that have not passed yet.
+const startOptions = computed(() => {
+  if (!isDate(date.value)) return []
+  const options = startTimeOptions(date.value)
+  if (date.value !== parisTodayYmd(new Date())) return options
+  const now = Date.now()
+  return options.filter((time) => Date.parse(toUtcInstant(date.value, time)) >= now)
+})
 const endOptions = computed(() =>
   startOptions.value.includes(startTime.value) ? endTimeOptions(date.value, startTime.value) : [],
 )
@@ -35,14 +54,21 @@ watch(startOptions, (options) => {
   if (next) startTime.value = next
 })
 watch(endOptions, (options) => {
-  if (options.includes(endTime.value)) return
-  const next = options[3] ?? options[options.length - 1]
-  if (next) endTime.value = next
+  const wanted = toHHmm(minutesOf(startTime.value) + durationMinutes)
+  const next = options.includes(wanted) ? wanted : options.includes(endTime.value) ? endTime.value : options[options.length - 1]
+  if (next && next !== endTime.value) endTime.value = next
 })
+
+// The results always follow the slot in the form, so it searches as soon as the slot changes.
+watch([date, startTime, endTime], onSubmit, { flush: 'post' })
 
 function onSubmit(): void {
   if (!isDate(date.value)) {
     errors.value = { start: 'Choose a date.' }
+    return
+  }
+  if (startOptions.value.length === 0) {
+    errors.value = { start: 'No start times are left today. Choose another date.' }
     return
   }
   const result = validateSlot(toUtcInstant(date.value, startTime.value), toUtcInstant(date.value, endTime.value), new Date())
@@ -86,18 +112,12 @@ const field =
           :class="field"
           :aria-invalid="errors.end ? 'true' : undefined"
           :aria-describedby="errors.end ? `${id}-end-error` : undefined"
+          @change="rememberDuration"
         >
           <option v-for="time in endOptions" :key="time" :value="time">{{ time }}</option>
         </select>
         <p v-if="errors.end" :id="`${id}-end-error`" class="mt-1 text-sm text-red-800">{{ errors.end }}</p>
       </div>
     </div>
-    <button
-      type="submit"
-      :disabled="busy"
-      class="mt-4 rounded-md bg-blue-700 px-5 py-2 font-medium text-white hover:bg-blue-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
-    >
-      Search
-    </button>
   </form>
 </template>

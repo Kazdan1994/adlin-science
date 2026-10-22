@@ -9,7 +9,7 @@ async function searchSlot(page: Page, start: string, end: string): Promise<void>
   await page.getByLabel('Date').fill(day)
   await page.getByLabel('Start', { exact: true }).selectOption(start)
   await page.getByLabel('End', { exact: true }).selectOption(end)
-  await page.getByRole('button', { name: 'Search' }).click()
+  await expect(page.getByRole('heading', { name: `${start}–${end}` })).toBeVisible()
   await expect(page.getByRole('button', { name: /^Book / })).toHaveCount(5)
 }
 

@@ -21,7 +21,7 @@ test('book a room, then the same search no longer lists it', async ({ page }) =>
   await page.getByLabel('Date').fill(tomorrow)
   await page.getByLabel('Start', { exact: true }).selectOption('10:00')
   await page.getByLabel('End', { exact: true }).selectOption('11:00')
-  await page.getByRole('button', { name: 'Search' }).click()
+  await expect(page.getByRole('heading', { name: /10:00–11:00/ })).toBeVisible()
 
   await page.getByRole('button', { name: 'Book Salle #2' }).click()
   const dialog = page.getByRole('dialog')
@@ -42,7 +42,6 @@ test('book a room, then the same search no longer lists it', async ({ page }) =>
   await expect(confirmation).toContainText("Bookings are final and can't be changed or cancelled.")
 
   await confirmation.getByRole('button', { name: 'Book another room' }).click()
-  await page.getByRole('button', { name: 'Search' }).click()
 
   await expect(page.getByRole('button', { name: 'Book Salle #1' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Book Salle #2' })).toHaveCount(0)

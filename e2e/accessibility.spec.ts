@@ -23,9 +23,6 @@ test('searches and books with the keyboard only', async ({ page }) => {
   await page.goto('/')
   await expect(bookButtons(page).first()).toBeVisible()
 
-  await tabTo(page, page.getByRole('button', { name: 'Search' }))
-  await page.keyboard.press('Enter')
-
   await tabTo(page, page.getByRole('button', { name: 'Book Salle #1' }))
   await page.keyboard.press('Space')
   await expect(page.getByRole('dialog').getByLabel('Your name')).toBeFocused()
@@ -71,7 +68,7 @@ test.describe('with reduced motion', () => {
     await page.getByLabel('Date').fill(addDays(parisTodayYmd(new Date()), 3))
     await page.getByLabel('Start', { exact: true }).selectOption('13:00')
     await page.getByLabel('End', { exact: true }).selectOption('14:00')
-    await page.getByRole('button', { name: 'Search' }).click()
+    await expect(page.getByRole('heading', { name: /13:00–14:00/ })).toBeVisible()
 
     await page.getByRole('button', { name: 'Book Salle nulle' }).click()
     await page.getByRole('dialog').getByLabel('Your name').fill('Alice Martin')

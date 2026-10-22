@@ -6,7 +6,7 @@ test('narrow the room list by capacity and equipment, then clear the filters', a
   await page.getByLabel('Date').fill(addDays(parisTodayYmd(new Date()), 1))
   await page.getByLabel('Start', { exact: true }).selectOption('14:00')
   await page.getByLabel('End', { exact: true }).selectOption('15:00')
-  await page.getByRole('button', { name: 'Search' }).click()
+  await expect(page.getByRole('heading', { name: /14:00–15:00/ })).toBeVisible()
   const bookButtons = page.getByRole('button', { name: /^Book / })
   await expect(bookButtons).toHaveCount(5)
 
@@ -21,7 +21,7 @@ test('narrow the room list by capacity and equipment, then clear the filters', a
 
   await page.getByLabel('Minimum seats').fill('30')
   await page.getByLabel('Minimum seats').blur()
-  await expect(page.getByText('No room matches these filters. Try fewer filters or another time.')).toBeVisible()
+  await expect(page.getByText('No room seats 30. The largest room seats 26.')).toBeVisible()
 
   await page.getByRole('button', { name: 'Clear filters' }).click()
   await expect(bookButtons).toHaveCount(5)

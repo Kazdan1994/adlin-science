@@ -8,6 +8,8 @@ const selectedRoom = ref<Room | null>(null)
 const conflictRoom = ref<Room | null>(null)
 const conflictBanner = useTemplateRef<{ focus: () => void }>('conflictBanner')
 const confirmation = useTemplateRef<{ focus: () => void }>('confirmation')
+const roomList = useTemplateRef<{ focus: () => void }>('roomList')
+const filterPanel = useTemplateRef<{ clear: () => void }>('filterPanel')
 const filtersActive = computed(() => criteria.value.minCapacity !== undefined || criteria.value.equipment.length > 0)
 
 // A conflict message only applies to the search it came from.
@@ -19,6 +21,19 @@ function openDialog(room: Room): void {
   reset()
   conflictRoom.value = null
   selectedRoom.value = room
+}
+
+// The confirmation unmounts, so focus moves to the refreshed list it was hiding.
+async function bookAnother(): Promise<void> {
+  reset()
+  await nextTick()
+  roomList.value?.focus()
+}
+
+async function clearFilters(): Promise<void> {
+  filterPanel.value?.clear()
+  await nextTick()
+  roomList.value?.focus()
 }
 
 async function confirm(bookerName: string): Promise<void> {
@@ -49,16 +64,21 @@ async function confirm(bookerName: string): Promise<void> {
 <template>
   <div class="space-y-6">
     <ErrorBanner v-if="conflictRoom" ref="conflictBanner" code="SLOT_TAKEN" :room-name="conflictRoom.name" />
-    <BookingConfirmation v-if="booking" ref="confirmation" :booking="booking" @another="reset" />
-    <SearchForm :criteria="criteria" :busy="status === 'loading'" @search="search" />
-    <FilterPanel :filters="criteria" :equipment-options="equipment" :max-capacity="maxCapacity" @update="setFilters" />
+    <BookingConfirmation v-if="booking" ref="confirmation" :booking="booking" @another="bookAnother" />
+    <SearchForm :criteria="criteria" @search="search" />
+    <FilterPanel ref="filterPanel" :filters="criteria" :equipment-options="equipment" :max-capacity="maxCapacity" @update="setFilters" />
     <RoomList
+      ref="roomList"
       :status="status"
       :rooms="rooms"
       :error="error"
       :filtered="filtersActive"
+      :time-slot="criteria"
+      :min-capacity="criteria.minCapacity"
+      :max-capacity="maxCapacity"
       @book="openDialog"
       @retry="refresh"
+      @clear="clearFilters"
     />
     <BookingDialog
       v-if="selectedRoom"
