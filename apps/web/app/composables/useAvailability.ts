@@ -34,7 +34,7 @@ export function useAvailability() {
       status.value = 'success'
     } catch (caught) {
       if (request !== latestRequest) return
-      error.value = caught as ApiRequestError
+      error.value = toApiError(caught)
       status.value = 'error'
     }
   }
@@ -47,5 +47,5 @@ export function useAvailability() {
 
   onMounted(refresh)
 
-  return { criteria: readonly(criteria), status: readonly(status), rooms: readonly(rooms), error: readonly(error), search, refresh }
+  return { criteria: shallowReadonly(criteria), status: shallowReadonly(status), rooms: shallowReadonly(rooms), error: shallowReadonly(error), search, refresh }
 }

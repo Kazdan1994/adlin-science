@@ -48,6 +48,10 @@ function toRequestError(error: unknown): ApiRequestError {
   return new ApiRequestError(code, message, fields)
 }
 
+export function toApiError(error: unknown): ApiRequestError {
+  return error instanceof ApiRequestError ? error : new ApiRequestError('INTERNAL_ERROR', messageForError('INTERNAL_ERROR'))
+}
+
 export function createApi(baseURL: string): Api {
   const http = $fetch.create({ baseURL })
 
