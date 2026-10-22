@@ -1,29 +1,60 @@
 @import "tailwindcss";
 
-/*
- * Apple-style system: the platform font (SF Pro on Apple devices), a light grey ground with white
- * tiles, near-black ink, and one blue for every action and for the slot being booked.
- * Token names predate this theme, so components restyle without renaming classes.
+/* Hallmark · macrostructure: Workbench · tone: utilitarian · anchor hue: cobalt 258
+ * genre: modern-minimal · theme: Cobalt · nav: flush hairline bar · footer: none (single-task tool)
  */
-@theme {
-  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", system-ui, "Segoe UI", sans-serif;
 
-  --color-ground: #f5f5f7;
-  --color-surface: #ffffff;
-  --color-raised: #e8e8ed;
-  --color-line: #d2d2d7;
-  --color-rule: #e8e8ed;
-  --color-control: #d2d2d7;
-  --color-ink: #1d1d1f;
-  --color-muted: #6e6e73;
-  --color-primary: #0071e3;
-  --color-primary-hover: #0077ed;
-  --color-data: #0071e3;
-  --color-data-tint: #f0f6fe;
-  --color-positive: #248a3d;
-  --color-negative: #d70015;
-  --color-negative-ink: #8a0010;
-  --color-negative-tint: #fff0f0;
+/*
+ * Cobalt system: cool near-white paper, cool charcoal ink, hairlines instead of shadows, and one
+ * cobalt for every action and for the slot being booked. Fonts are self-hosted so the CSP stays
+ * default-src 'self'. Token names predate this theme, so components restyle without renaming classes.
+ */
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/inter.woff2") format("woff2");
+  font-weight: 400 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Space Grotesk";
+  src: url("/fonts/space-grotesk.woff2") format("woff2");
+  font-weight: 500 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("/fonts/jetbrains-mono.woff2") format("woff2");
+  font-weight: 400 500;
+  font-display: swap;
+}
+
+@theme {
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --color-ground: oklch(98.5% 0.004 250);
+  --color-surface: oklch(99.7% 0.002 250);
+  --color-raised: oklch(95.5% 0.006 255);
+  --color-line: oklch(89% 0.01 255);
+  --color-rule: oklch(92.5% 0.008 255);
+  --color-control: oklch(84% 0.012 255);
+  --color-ink: oklch(24% 0.02 258);
+  --color-muted: oklch(47% 0.018 257);
+  --color-primary: oklch(52% 0.2 258);
+  --color-primary-hover: oklch(46% 0.19 258);
+  --color-data: oklch(52% 0.2 258);
+  --color-data-tint: oklch(96% 0.025 256);
+  --color-positive: oklch(50% 0.13 150);
+  --color-negative: oklch(52% 0.2 27);
+  --color-negative-ink: oklch(40% 0.15 27);
+  --color-negative-tint: oklch(97% 0.015 27);
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in: cubic-bezier(0.55, 0, 1, 0.45);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 
   /* Type scale after Apple's text styles: each size carries its own leading and tracking. */
   --text-caption: 0.75rem;
@@ -36,7 +67,7 @@
   --text-subhead--line-height: 1.47;
   --text-body: 1.0625rem;
   --text-body--line-height: 1.47;
-  --text-body--letter-spacing: -0.02em;
+  --text-body--letter-spacing: -0.011em;
   --text-title3: 1.1875rem;
   --text-title3--line-height: 1.32;
   --text-title3--letter-spacing: -0.02em;
@@ -45,27 +76,29 @@
   --text-title2--letter-spacing: -0.02em;
   --text-title1: 1.5rem;
   --text-title1--line-height: 1.17;
-  --text-title1--letter-spacing: -0.025em;
+  --text-title1--letter-spacing: -0.03em;
   --text-large-title: 1.75rem;
   --text-large-title--line-height: 1.14;
-  --text-large-title--letter-spacing: -0.025em;
+  --text-large-title--letter-spacing: -0.03em;
   --text-hero: 2rem;
   --text-hero--line-height: 1.1;
-  --text-hero--letter-spacing: -0.025em;
+  --text-hero--letter-spacing: -0.03em;
   --text-hero-lg: 3rem;
   --text-hero-lg--line-height: 1.08;
-  --text-hero-lg--letter-spacing: -0.025em;
+  --text-hero-lg--letter-spacing: -0.03em;
 
   --container-page: 68.75rem;
   --container-sheet: min(30rem, calc(100vw - 2rem));
 
-  --radius-sheet: 22px;
-  --radius-card: 18px;
-  --radius-control: 12px;
-  --radius-pill: 980px;
+  --radius-sheet: 12px;
+  --radius-card: 10px;
+  --radius-control: 6px;
+  /* Kept for class compatibility: Cobalt draws buttons with the control radius, never pills. */
+  --radius-pill: 6px;
 
-  --shadow-tile: 0 2px 12px rgb(0 0 0 / 0.04);
-  --shadow-sheet: 0 24px 64px rgb(0 0 0 / 0.18);
+  /* Depth comes from borders: a tile is a 1px hairline ring, only the dialog lifts. */
+  --shadow-tile: 0 0 0 1px var(--color-line);
+  --shadow-sheet: 0 0 0 1px var(--color-line), 0 16px 48px oklch(24% 0.02 258 / 0.16);
 }
 
 /* Column templates for the room table; the header row and every room row share them. */
@@ -79,8 +112,14 @@
     color: var(--color-ink);
     background-color: var(--color-ground);
     font-variant-numeric: tabular-nums;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.011em;
     -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
   }
 
   ::selection {
@@ -89,26 +128,16 @@
   }
 }
 
-/* Translucent chrome: content scrolls under the nav. Solid when the user asks for less transparency. */
+/* Flush nav bar: solid paper and one hairline, no translucency. */
 @layer components {
-  .glass-nav {
-    background-color: rgb(255 255 255 / 0.72);
-    backdrop-filter: saturate(180%) blur(20px);
-    -webkit-backdrop-filter: saturate(180%) blur(20px);
-  }
-
-  @media (prefers-reduced-transparency: reduce) {
-    .glass-nav {
-      background-color: var(--color-surface);
-      backdrop-filter: none;
-      -webkit-backdrop-filter: none;
-    }
+  .app-nav {
+    background-color: var(--color-ground);
+    border-bottom: 1px solid var(--color-line);
   }
 
   @media (prefers-contrast: more) {
-    .glass-nav {
-      background-color: var(--color-surface);
-      border-bottom: 1px solid var(--color-ink);
+    .app-nav {
+      border-bottom-color: var(--color-ink);
     }
   }
 }

@@ -62,7 +62,7 @@ async function confirm(bookerName: string): Promise<void> {
 
 <template>
   <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-12 lg:gap-5">
-    <aside aria-label="Search" class="rounded-card bg-surface p-5 shadow-tile sm:p-7 lg:sticky lg:top-16 lg:col-span-4">
+    <aside aria-label="Search" class="rounded-card bg-surface p-5 shadow-tile sm:p-7 lg:sticky lg:top-18 lg:col-span-4">
       <SearchForm ref="searchForm" :criteria="criteria" @search="search" />
       <FilterPanel
         ref="filterPanel"
