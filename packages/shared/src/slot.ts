@@ -22,7 +22,7 @@ const parseInstant = (value: string): number | undefined => {
   return Number.isNaN(ms) ? undefined : ms
 }
 
-const addDays = (ymd: string, days: number): string => {
+export const addDays = (ymd: string, days: number): string => {
   const d = new Date(`${ymd}T00:00:00.000Z`)
   d.setUTCDate(d.getUTCDate() + days)
   return d.toISOString().slice(0, 10)
