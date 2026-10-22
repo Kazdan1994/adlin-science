@@ -6,4 +6,8 @@ dist/
 .env
 playwright-report/
 test-results/
-.claude/skills/speckit-*
+
+# claude
+.claude/*
+!.claude/skills/
+.claude/settings.local.json
