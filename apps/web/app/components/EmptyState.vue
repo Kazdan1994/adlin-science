@@ -12,7 +12,7 @@ const message = computed(() => {
 </script>
 
 <template>
-  <div class="flex flex-col items-start gap-3 rounded-card bg-ground px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+  <div class="flex flex-col items-start gap-3 bg-surface px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
     <p class="text-subhead">{{ message }}</p>
     <button
       v-if="!filtered"

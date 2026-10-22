@@ -22,11 +22,11 @@ defineExpose({ focus: () => heading.value?.focus() })
           <circle class="confirmation-check-ring" cx="12" cy="12" r="10" />
           <path class="confirmation-check-mark" d="M7 12.5l3.5 3.5L17 9" />
         </svg>
-        <h2 :id="headingId" ref="heading" tabindex="-1" class="text-title1 font-semibold focus:outline-none">Booking confirmed</h2>
+        <h2 :id="headingId" ref="heading" tabindex="-1" class="text-title1 font-extrabold focus:outline-none">Booking confirmed</h2>
       </div>
       <p class="mt-1 text-callout text-ink">{{ booking.room.name }} is yours for this slot. No one else can book it.</p>
       <div class="confirmation-slot mt-4 rounded-control bg-data-tint px-4 py-3">
-        <p class="confirmation-slot-time text-large-title font-semibold text-data">{{ formatTimeRange(parisTimeOf(booking.start), formatEndTime(booking.end)) }}</p>
+        <p class="confirmation-slot-time text-hero font-extrabold text-data">{{ formatTimeRange(parisTimeOf(booking.start), formatEndTime(booking.end)) }}</p>
         <p class="mt-0.5 text-callout text-ink">{{ formatDay(parisDateOf(booking.start)) }} <span class="whitespace-nowrap text-muted">(Paris time)</span></p>
       </div>
       <dl class="mt-4 grid grid-cols-[auto_1fr] gap-x-6 gap-y-1.5 text-callout">
@@ -76,10 +76,10 @@ defineExpose({ focus: () => heading.value?.focus() })
 
 @keyframes confirmation-fill {
   from {
-    clip-path: inset(0 100% 0 0 round 6px);
+    clip-path: inset(0 100% 0 0);
   }
   to {
-    clip-path: inset(0 0 0 0 round 6px);
+    clip-path: inset(0 0 0 0);
   }
 }
 

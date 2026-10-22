@@ -1,56 +1,41 @@
 @import "tailwindcss";
 
-/* Hallmark · macrostructure: Workbench · tone: utilitarian · anchor hue: cobalt 258
- * genre: modern-minimal · theme: Cobalt · nav: flush hairline bar · footer: none (single-task tool)
- */
-
 /*
- * Cobalt system: cool near-white paper, cool charcoal ink, hairlines instead of shadows, and one
- * cobalt for every action and for the slot being booked. Fonts are self-hosted so the CSP stays
- * default-src 'self'. Token names predate this theme, so components restyle without renaming classes.
+ * Wayfinding system: the page reads like an office floor's signage. Concrete-grey ground, black
+ * door plates with white lettering, and one signal yellow for the slot being booked. Overpass is
+ * drawn from Highway Gothic, the face of road and building signs. Fonts are self-hosted so the CSP
+ * stays default-src 'self'. Token names predate this theme, so components restyle without renaming.
  */
 @font-face {
-  font-family: "Inter";
-  src: url("/fonts/inter.woff2") format("woff2");
-  font-weight: 400 600;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Space Grotesk";
-  src: url("/fonts/space-grotesk.woff2") format("woff2");
-  font-weight: 500 700;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "JetBrains Mono";
-  src: url("/fonts/jetbrains-mono.woff2") format("woff2");
-  font-weight: 400 500;
+  font-family: "Overpass";
+  src: url("/fonts/overpass.woff2") format("woff2");
+  font-weight: 100 900;
   font-display: swap;
 }
 
 @theme {
-  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-sans: "Overpass", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Overpass", system-ui, sans-serif;
 
-  --color-ground: oklch(98.5% 0.004 250);
-  --color-surface: oklch(99.7% 0.002 250);
-  --color-raised: oklch(95.5% 0.006 255);
-  --color-line: oklch(89% 0.01 255);
-  --color-rule: oklch(92.5% 0.008 255);
-  --color-control: oklch(84% 0.012 255);
-  --color-ink: oklch(24% 0.02 258);
-  --color-muted: oklch(47% 0.018 257);
-  --color-primary: oklch(52% 0.2 258);
-  --color-primary-hover: oklch(46% 0.19 258);
-  --color-data: oklch(52% 0.2 258);
-  --color-data-tint: oklch(96% 0.025 256);
-  --color-positive: oklch(50% 0.13 150);
-  --color-negative: oklch(52% 0.2 27);
-  --color-negative-ink: oklch(40% 0.15 27);
-  --color-negative-tint: oklch(97% 0.015 27);
+  --color-ground: oklch(91.5% 0.004 95);
+  --color-surface: oklch(98.5% 0.002 95);
+  --color-raised: oklch(87% 0.005 95);
+  --color-line: oklch(80% 0.006 95);
+  --color-rule: oklch(91.5% 0.004 95);
+  --color-control: oklch(55% 0.006 95);
+  --color-ink: oklch(17% 0.004 95);
+  --color-muted: oklch(40% 0.006 95);
+  --color-plate: oklch(17% 0.004 95);
+  --color-plate-ink: oklch(98.5% 0.002 95);
+  --color-plate-muted: oklch(78% 0.004 95);
+  --color-primary: oklch(17% 0.004 95);
+  --color-primary-hover: oklch(32% 0.006 95);
+  --color-data: oklch(17% 0.004 95);
+  --color-data-tint: oklch(87% 0.17 95);
+  --color-positive: oklch(45% 0.12 150);
+  --color-negative: oklch(48% 0.19 27);
+  --color-negative-ink: oklch(38% 0.15 27);
+  --color-negative-tint: oklch(93% 0.03 27);
 
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in: cubic-bezier(0.55, 0, 1, 0.45);
@@ -80,31 +65,30 @@
   --text-large-title: 1.75rem;
   --text-large-title--line-height: 1.14;
   --text-large-title--letter-spacing: -0.03em;
-  --text-hero: 2rem;
-  --text-hero--line-height: 1.1;
-  --text-hero--letter-spacing: -0.03em;
-  --text-hero-lg: 3rem;
-  --text-hero-lg--line-height: 1.08;
-  --text-hero-lg--letter-spacing: -0.03em;
+  --text-hero: 2.75rem;
+  --text-hero--line-height: 0.95;
+  --text-hero--letter-spacing: -0.035em;
+  --text-hero-lg: clamp(3.5rem, 7.2vw, 6.5rem);
+  --text-hero-lg--line-height: 0.9;
+  --text-hero-lg--letter-spacing: -0.04em;
 
   --container-page: 68.75rem;
   --container-sheet: min(30rem, calc(100vw - 2rem));
 
-  --radius-sheet: 12px;
-  --radius-card: 10px;
-  --radius-control: 6px;
-  /* Kept for class compatibility: Cobalt draws buttons with the control radius, never pills. */
-  --radius-pill: 6px;
+  /* Signs are cut square: no rounded plates, no shadows at rest. Only the dialog lifts. */
+  --radius-sheet: 0;
+  --radius-card: 0;
+  --radius-control: 0;
+  --radius-pill: 0;
 
-  /* Depth comes from borders: a tile is a 1px hairline ring, only the dialog lifts. */
-  --shadow-tile: 0 0 0 1px var(--color-line);
-  --shadow-sheet: 0 0 0 1px var(--color-line), 0 16px 48px oklch(24% 0.02 258 / 0.16);
+  --shadow-tile: none;
+  --shadow-sheet: 0 24px 64px oklch(17% 0.004 95 / 0.28);
 }
 
 /* Column templates for the room table; the header row and every room row share them. */
 :root {
-  --grid-room-row: minmax(0, 1fr) 3.5rem auto;
-  --grid-room-row-wide: minmax(0, 1fr) minmax(0, 1fr) 4rem auto;
+  --grid-room-row: 4rem minmax(0, 1fr) auto;
+  --grid-room-row-wide: 5.5rem minmax(0, 1.2fr) minmax(0, 1fr) 4.5rem auto;
 }
 
 @layer base {
@@ -112,7 +96,6 @@
     color: var(--color-ink);
     background-color: var(--color-ground);
     font-variant-numeric: tabular-nums;
-    letter-spacing: -0.011em;
     -webkit-font-smoothing: antialiased;
   }
 
@@ -120,6 +103,7 @@
   h2,
   h3 {
     font-family: var(--font-display);
+    letter-spacing: -0.02em;
   }
 
   ::selection {
@@ -128,16 +112,33 @@
   }
 }
 
-/* Flush nav bar: solid paper and one hairline, no translucency. */
+/* The nav is the building's lintel sign: a solid black band, no translucency. */
 @layer components {
   .app-nav {
-    background-color: var(--color-ground);
-    border-bottom: 1px solid var(--color-line);
+    background-color: var(--color-plate);
+    color: var(--color-plate-ink);
+  }
+}
+
+/*
+ * The search panel is a black directory board. Re-pointing the role tokens inside it keeps focus
+ * rings, hints and errors legible on the dark plate without per-component overrides.
+ */
+.search-plate {
+  --color-primary: oklch(87% 0.17 95);
+  --color-muted: var(--color-plate-muted);
+  --color-negative: oklch(78% 0.13 27);
+  --color-raised: oklch(32% 0.006 95);
+  --color-line: oklch(40% 0.006 95);
+  --color-ground: oklch(24% 0.005 95);
+  --color-ink: var(--color-plate-ink);
+  --color-data-tint: oklch(32% 0.006 95);
+
+  & :is(input, select) {
+    color: oklch(17% 0.004 95);
   }
 
-  @media (prefers-contrast: more) {
-    .app-nav {
-      border-bottom-color: var(--color-ink);
-    }
+  & input::placeholder {
+    color: oklch(45% 0.006 95);
   }
 }

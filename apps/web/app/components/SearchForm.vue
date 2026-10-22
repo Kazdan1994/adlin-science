@@ -85,7 +85,7 @@ const field =
 
 <template>
   <form novalidate :aria-labelledby="`${id}-title`" @submit.prevent="onSubmit">
-    <h2 :id="`${id}-title`" class="text-title3 font-semibold">When</h2>
+    <h2 :id="`${id}-title`" class="text-title2 font-extrabold">When</h2>
     <div class="mt-4 grid grid-cols-2 gap-3">
       <div class="col-span-2">
         <label :for="`${id}-date`" class="text-callout font-medium">Date</label>

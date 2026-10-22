@@ -58,7 +58,7 @@ defineExpose({ clear })
 <template>
   <div>
     <div class="flex items-center justify-between gap-3">
-      <h2 :id="`${id}-title`" class="text-title3 font-semibold">
+      <h2 :id="`${id}-title`" class="text-title2 font-extrabold">
         Filters <span v-if="activeCount > 0" class="font-normal text-muted">({{ activeCount }})</span>
       </h2>
       <button

@@ -61,15 +61,15 @@ async function confirm(bookerName: string): Promise<void> {
 </script>
 
 <template>
-  <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-12 lg:gap-5">
-    <aside aria-label="Search" class="rounded-card bg-surface p-5 shadow-tile sm:p-7 lg:sticky lg:top-18 lg:col-span-4">
+  <div class="grid grid-cols-1 items-start gap-12 lg:grid-cols-12 lg:gap-5">
+    <aside aria-label="Search" class="search-plate bg-plate p-5 text-plate-ink sm:p-7 lg:sticky lg:top-20 lg:col-span-4">
       <SearchForm ref="searchForm" :criteria="criteria" @search="search" />
       <FilterPanel
         ref="filterPanel"
         :filters="criteria"
         :equipment-options="equipment"
         :max-capacity="maxCapacity"
-        class="mt-6 border-t border-rule pt-6"
+        class="mt-8"
         @update="setFilters"
       />
     </aside>

@@ -46,11 +46,11 @@ function onSubmit(): void {
     @close="emit('close')"
   >
     <form novalidate @submit.prevent="onSubmit">
-      <h2 :id="titleId" class="text-title1 font-semibold">Book {{ room.name }}</h2>
+      <h2 :id="titleId" class="text-title1 font-extrabold">Book {{ room.name }}</h2>
       <p class="mt-1 text-subhead text-muted">{{ roomFacts }}</p>
 
       <div class="mt-4 rounded-control bg-data-tint px-4 py-3">
-        <p class="text-large-title font-semibold text-data">{{ formatTimeRange(timeSlot.startTime, timeSlot.endTime) }}</p>
+        <p class="text-hero font-extrabold text-data">{{ formatTimeRange(timeSlot.startTime, timeSlot.endTime) }}</p>
         <p class="mt-0.5 text-callout text-ink">{{ formatDay(timeSlot.date) }} <span class="whitespace-nowrap text-muted">(Paris time)</span></p>
       </div>
 
@@ -100,7 +100,7 @@ function onSubmit(): void {
 
 <style scoped>
 /*
- * The sheet grows into place on a critically damped curve while the blurred scrim fades in behind it.
+ * The sheet grows into place on a critically damped curve while the dark scrim fades in behind it.
  * The sheet itself stays opaque so its text keeps full contrast from the first frame.
  */
 .booking-sheet[open] {
@@ -113,9 +113,7 @@ function onSubmit(): void {
 }
 
 .booking-sheet[open]::backdrop {
-  background-color: rgb(0 0 0 / 0.32);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background-color: oklch(17% 0.004 95 / 0.6);
   opacity: 1;
   transition: opacity 0.3s ease-out;
 
@@ -128,14 +126,6 @@ function onSubmit(): void {
   .booking-sheet[open] {
     transform: none;
     transition: none;
-  }
-}
-
-@media (prefers-reduced-transparency: reduce) {
-  .booking-sheet[open]::backdrop {
-    background-color: rgb(0 0 0 / 0.5);
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
   }
 }
 </style>
