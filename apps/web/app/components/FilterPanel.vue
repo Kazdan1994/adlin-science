@@ -58,12 +58,12 @@ defineExpose({ clear })
 <template>
   <div>
     <div class="flex items-center justify-between gap-3">
-      <h2 :id="`${id}-title`" class="text-base font-semibold">
+      <h2 :id="`${id}-title`" class="text-title3 font-semibold">
         Filters <span v-if="activeCount > 0" class="font-normal text-muted">({{ activeCount }})</span>
       </h2>
       <button
         type="button"
-        class="h-11 rounded-control px-2 text-sm font-medium sm:h-8 hover:bg-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary lg:hidden"
+        class="h-11 rounded-pill px-3 text-callout font-medium text-primary sm:h-8 hover:bg-data-tint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary lg:hidden"
         :aria-expanded="open"
         :aria-controls="`${id}-body`"
         @click="open = !open"
@@ -73,7 +73,7 @@ defineExpose({ clear })
     </div>
     <div :id="`${id}-body`" role="group" :aria-labelledby="`${id}-title`" class="mt-3 space-y-4" :class="open ? 'block' : 'hidden lg:block'">
       <div>
-        <label :for="`${id}-seats`" class="text-sm font-medium">Minimum seats</label>
+        <label :for="`${id}-seats`" class="text-callout font-medium">Minimum seats</label>
         <input
           :id="`${id}-seats`"
           ref="seatsInput"
@@ -84,20 +84,20 @@ defineExpose({ clear })
           step="1"
           placeholder="Any"
           :value="seatsText"
-          class="mt-1.5 block h-11 w-full rounded-control border border-control bg-surface px-3 text-base sm:h-9 sm:text-sm placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary aria-[invalid=true]:border-negative"
+          class="mt-1.5 block h-11 w-full rounded-control border border-control bg-surface px-3.5 text-body sm:h-10 sm:text-subhead focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-primary aria-invalid:border-negative placeholder:text-muted"
           :aria-invalid="seatsError ? 'true' : undefined"
           :aria-describedby="`${id}-seats-hint`"
           @input="seatsText = ($event.target as HTMLInputElement).value"
           @change="onSeatsChange"
         >
-        <p :id="`${id}-seats-hint`" aria-live="polite" class="mt-1.5 text-sm" :class="seatsError ? 'text-negative' : 'text-muted'">
+        <p :id="`${id}-seats-hint`" aria-live="polite" class="mt-1.5 text-callout" :class="seatsError ? 'text-negative' : 'text-muted'">
           {{ seatsError ?? (maxCapacity > 0 ? `The largest room seats ${maxCapacity}.` : '') }}
         </p>
       </div>
       <fieldset v-if="equipmentOptions.length > 0">
-        <legend class="text-sm font-medium">Equipment</legend>
+        <legend class="text-callout font-medium">Equipment</legend>
         <div class="mt-1 grid sm:mt-2 sm:gap-2">
-          <label v-for="name in equipmentOptions" :key="name" class="flex min-h-11 items-center gap-2.5 text-sm sm:min-h-0">
+          <label v-for="name in equipmentOptions" :key="name" class="flex min-h-11 items-center gap-2.5 text-callout sm:min-h-0">
             <input
               type="checkbox"
               class="h-4 w-4 accent-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
@@ -111,7 +111,7 @@ defineExpose({ clear })
       <button
         type="button"
         :disabled="!active"
-        class="h-11 rounded-control border sm:h-8 border-control bg-surface px-3 text-sm font-medium hover:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:border-line disabled:bg-transparent disabled:text-muted"
+        class="h-11 sm:h-8 rounded-pill bg-raised px-4 text-callout font-medium text-ink hover:bg-line transition-transform duration-100 ease-out active:scale-97 motion-reduce:transition-none motion-reduce:active:scale-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:bg-ground disabled:text-muted disabled:active:scale-100"
         @click="clearFromPanel"
       >
         Clear filters

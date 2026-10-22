@@ -61,19 +61,19 @@ async function confirm(bookerName: string): Promise<void> {
 </script>
 
 <template>
-  <div class="grid grid-cols-1 items-start gap-3 lg:grid-cols-12">
-    <aside aria-label="Search" class="rounded-card border border-line bg-surface p-5 lg:sticky lg:top-6 lg:col-span-4">
+  <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-12 lg:gap-5">
+    <aside aria-label="Search" class="rounded-card bg-surface p-5 shadow-tile sm:p-7 lg:sticky lg:top-16 lg:col-span-4">
       <SearchForm ref="searchForm" :criteria="criteria" @search="search" />
       <FilterPanel
         ref="filterPanel"
         :filters="criteria"
         :equipment-options="equipment"
         :max-capacity="maxCapacity"
-        class="mt-5 border-t border-rule pt-5"
+        class="mt-6 border-t border-rule pt-6"
         @update="setFilters"
       />
     </aside>
-    <div class="grid grid-cols-1 gap-3 lg:col-span-8">
+    <div class="grid grid-cols-1 gap-4 lg:col-span-8 lg:gap-5">
       <ErrorBanner v-if="conflictRoom" ref="conflictBanner" code="SLOT_TAKEN" :room-name="conflictRoom.name" />
       <BookingConfirmation v-if="booking" ref="confirmation" :booking="booking" @another="bookAnother" />
       <RoomList

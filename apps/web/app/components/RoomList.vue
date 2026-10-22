@@ -70,46 +70,46 @@ const liveMessage = computed(() => {
 </script>
 
 <template>
-  <section aria-labelledby="rooms-heading" :aria-busy="status === 'loading'" class="rounded-card border border-line bg-surface">
-    <div class="flex flex-col gap-1 px-5 pt-5 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-      <h2 id="rooms-heading" ref="heading" tabindex="-1" class="text-base font-semibold focus:outline-none">
+  <section aria-labelledby="rooms-heading" :aria-busy="status === 'loading'" class="rounded-card bg-surface shadow-tile">
+    <div class="flex flex-col gap-1 px-4 pt-6 sm:flex-row sm:items-start sm:justify-between sm:gap-4 sm:px-7 sm:pt-7">
+      <h2 id="rooms-heading" ref="heading" tabindex="-1" class="text-title2 font-semibold focus:outline-none sm:text-title1">
         Available rooms
-        <span class="mt-0.5 block text-sm font-normal text-muted">
+        <span class="mt-1 block text-subhead font-normal tracking-normal text-muted">
           {{ formatDay(timeSlot.date) }}, <span class="whitespace-nowrap font-medium text-ink">{{ formatTimeRange(timeSlot.startTime, timeSlot.endTime) }}</span> (Paris time)
         </span>
       </h2>
-      <p class="shrink-0 text-sm text-muted">{{ freeCount }}</p>
+      <p class="shrink-0 text-subhead text-muted">{{ freeCount }}</p>
     </div>
     <p class="sr-only" role="status">{{ liveMessage }}</p>
 
-    <div class="px-5 pb-4 pt-4" aria-hidden="true">
-      <div class="relative h-3 rounded-sm bg-raised">
+    <div class="px-4 pb-5 pt-4 sm:px-7" aria-hidden="true">
+      <div class="relative h-2 rounded-full bg-raised">
         <div v-for="band in nightBands" :key="band.left" class="night-band absolute inset-y-0" :style="band" />
-        <div class="absolute inset-y-0 rounded-sm bg-data" :style="slotStyle" />
+        <div class="absolute inset-y-0 rounded-full bg-data" :style="slotStyle" />
         <div v-if="nowOffset" class="absolute -inset-y-1 w-px bg-ink" :style="{ left: nowOffset }" />
       </div>
-      <div class="mt-1.5 flex justify-between text-xs text-muted">
+      <div class="mt-1.5 flex justify-between text-caption text-muted">
         <span v-for="tick in ticks" :key="tick">{{ tick }}</span>
       </div>
     </div>
 
     <ul v-if="status === 'loading'" class="border-t border-rule" aria-hidden="true">
-      <li v-for="n in 3" :key="n" class="flex items-center justify-between gap-4 border-b border-rule px-5 py-4 last:border-b-0">
+      <li v-for="n in 3" :key="n" class="flex items-center justify-between gap-4 border-b border-rule px-4 py-4 sm:px-7 last:border-b-0">
         <div class="space-y-2">
-          <div class="h-4 w-28 rounded-sm bg-raised" />
-          <div class="h-3 w-40 rounded-sm bg-raised" />
+          <div class="h-4 w-28 rounded-full bg-raised" />
+          <div class="h-3 w-40 rounded-full bg-raised" />
         </div>
-        <div class="h-8 w-16 rounded-control bg-raised" />
+        <div class="h-8 w-16 rounded-pill bg-raised" />
       </li>
     </ul>
-    <div v-else-if="status === 'error' && error" class="border-t border-rule p-5">
+    <div v-else-if="status === 'error' && error" class="border-t border-rule p-4 sm:p-7">
       <ErrorBanner :code="error.code" retryable @retry="$emit('retry')" />
     </div>
-    <div v-else-if="status === 'success' && rooms.length === 0" class="border-t border-rule p-5">
+    <div v-else-if="status === 'success' && rooms.length === 0" class="border-t border-rule p-4 sm:p-7">
       <EmptyState :filtered="filtered" :min-capacity="minCapacity" :max-capacity="maxCapacity" @clear="$emit('clear')" @change-time="$emit('changeTime')" />
     </div>
     <template v-else-if="status === 'success'">
-      <div class="grid grid-cols-[minmax(0,1fr)_3.5rem_auto] items-center gap-x-4 border-t border-rule px-5 py-2 text-xs font-medium text-muted sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_4rem_auto]">
+      <div class="grid grid-cols-(--grid-room-row) items-center gap-x-4 border-t border-rule px-4 py-2 text-footnote font-medium text-muted sm:px-7 sm:grid-cols-(--grid-room-row-wide)">
         <span>Room</span>
         <span class="hidden sm:block">Equipment</span>
         <button
@@ -125,7 +125,7 @@ const liveMessage = computed(() => {
             <path d="M3.5 7.5L6 10l2.5-2.5" :class="seatOrder === 'asc' && 'opacity-25'" />
           </svg>
         </button>
-        <span class="invisible px-3 text-sm" aria-hidden="true">Book</span>
+        <span class="invisible px-4 text-callout" aria-hidden="true">Book</span>
       </div>
       <ul class="border-t border-rule">
         <RoomCard v-for="room in sortedRooms" :key="room.slug" :room="room" @book="$emit('book', $event)" />

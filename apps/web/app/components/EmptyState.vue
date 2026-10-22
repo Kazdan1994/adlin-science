@@ -12,12 +12,12 @@ const message = computed(() => {
 </script>
 
 <template>
-  <div class="flex flex-col items-start gap-3 rounded-card border border-dashed border-control px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between">
-    <p class="text-sm">{{ message }}</p>
+  <div class="flex flex-col items-start gap-3 rounded-card bg-ground px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+    <p class="text-subhead">{{ message }}</p>
     <button
       v-if="!filtered"
       type="button"
-      class="h-11 shrink-0 rounded-control border border-control bg-surface px-3 text-sm font-medium hover:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:h-8"
+      class="h-11 shrink-0 rounded-pill bg-raised px-4 text-callout font-medium text-ink hover:bg-line transition-transform duration-100 ease-out active:scale-97 motion-reduce:transition-none motion-reduce:active:scale-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:h-8"
       @click="$emit('changeTime')"
     >
       Change time
@@ -25,7 +25,7 @@ const message = computed(() => {
     <button
       v-else
       type="button"
-      class="h-11 shrink-0 sm:h-8 rounded-control border border-control bg-surface px-3 text-sm font-medium hover:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+      class="h-11 shrink-0 sm:h-8 rounded-pill bg-raised px-4 text-callout font-medium text-ink hover:bg-line transition-transform duration-100 ease-out active:scale-97 motion-reduce:transition-none motion-reduce:active:scale-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
       @click="$emit('clear')"
     >
       Remove filters

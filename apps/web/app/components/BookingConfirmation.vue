@@ -16,29 +16,29 @@ defineExpose({ focus: () => heading.value?.focus() })
     enter-active-class="transition-opacity duration-200 ease-out"
     enter-from-class="opacity-0"
   >
-    <section :aria-labelledby="headingId" class="rounded-card border border-line bg-surface p-5">
+    <section :aria-labelledby="headingId" class="rounded-card bg-surface p-5 shadow-tile sm:p-7">
       <div class="flex items-center gap-2.5">
         <svg class="confirmation-check h-7 w-7 shrink-0 text-positive" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <circle class="confirmation-check-ring" cx="12" cy="12" r="10" />
           <path class="confirmation-check-mark" d="M7 12.5l3.5 3.5L17 9" />
         </svg>
-        <h2 :id="headingId" ref="heading" tabindex="-1" class="text-lg font-semibold focus:outline-none">Booking confirmed</h2>
+        <h2 :id="headingId" ref="heading" tabindex="-1" class="text-title1 font-semibold focus:outline-none">Booking confirmed</h2>
       </div>
-      <p class="mt-1 text-sm text-ink">{{ booking.room.name }} is yours for this slot. No one else can book it.</p>
+      <p class="mt-1 text-callout text-ink">{{ booking.room.name }} is yours for this slot. No one else can book it.</p>
       <div class="confirmation-slot mt-4 rounded-control bg-data-tint px-4 py-3">
-        <p class="confirmation-slot-time text-2xl font-semibold tracking-tight text-data">{{ formatTimeRange(parisTimeOf(booking.start), formatEndTime(booking.end)) }}</p>
-        <p class="mt-0.5 text-sm text-ink">{{ formatDay(parisDateOf(booking.start)) }} <span class="whitespace-nowrap text-muted">(Paris time)</span></p>
+        <p class="confirmation-slot-time text-large-title font-semibold text-data">{{ formatTimeRange(parisTimeOf(booking.start), formatEndTime(booking.end)) }}</p>
+        <p class="mt-0.5 text-callout text-ink">{{ formatDay(parisDateOf(booking.start)) }} <span class="whitespace-nowrap text-muted">(Paris time)</span></p>
       </div>
-      <dl class="mt-4 grid grid-cols-[auto_1fr] gap-x-6 gap-y-1.5 text-sm">
+      <dl class="mt-4 grid grid-cols-[auto_1fr] gap-x-6 gap-y-1.5 text-callout">
         <dt class="text-muted">Room</dt>
         <dd class="font-medium">{{ booking.room.name }}</dd>
         <dt class="text-muted">Name</dt>
         <dd class="break-words">{{ booking.bookerName }}</dd>
       </dl>
-      <p class="mt-4 text-sm text-muted">Bookings are final and can't be changed or cancelled.</p>
+      <p class="mt-4 text-callout text-muted">Bookings are final and can't be changed or cancelled.</p>
       <button
         type="button"
-        class="mt-4 h-9 rounded-control border border-control bg-surface px-4 text-sm font-medium hover:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        class="mt-5 h-11 sm:h-10 rounded-pill bg-primary px-5 text-callout font-medium text-white hover:bg-primary-hover transition-transform duration-100 ease-out active:scale-97 motion-reduce:transition-none motion-reduce:active:scale-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
         @click="$emit('another')"
       >
         Book another room

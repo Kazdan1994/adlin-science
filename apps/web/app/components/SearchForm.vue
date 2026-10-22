@@ -80,19 +80,19 @@ const dateInput = useTemplateRef<HTMLInputElement>('dateInput')
 defineExpose({ focusDate: () => dateInput.value?.focus() })
 
 const field =
-  'mt-1.5 block h-11 w-full rounded-control border border-control bg-surface px-3 text-base sm:h-9 sm:text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary aria-[invalid=true]:border-negative'
+  'mt-1.5 block h-11 w-full rounded-control border border-control bg-surface px-3.5 text-body sm:h-10 sm:text-subhead focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-primary aria-invalid:border-negative'
 </script>
 
 <template>
   <form novalidate :aria-labelledby="`${id}-title`" @submit.prevent="onSubmit">
-    <h2 :id="`${id}-title`" class="text-base font-semibold">When</h2>
-    <div class="mt-3 grid grid-cols-2 gap-3">
+    <h2 :id="`${id}-title`" class="text-title3 font-semibold">When</h2>
+    <div class="mt-4 grid grid-cols-2 gap-3">
       <div class="col-span-2">
-        <label :for="`${id}-date`" class="text-sm font-medium">Date</label>
+        <label :for="`${id}-date`" class="text-callout font-medium">Date</label>
         <input :id="`${id}-date`" ref="dateInput" v-model="date" type="date" :min="today" :max="maxDate" required :class="field">
       </div>
       <div>
-        <label :for="`${id}-start`" class="text-sm font-medium">Start</label>
+        <label :for="`${id}-start`" class="text-callout font-medium">Start</label>
         <select
           :id="`${id}-start`"
           v-model="startTime"
@@ -102,10 +102,10 @@ const field =
         >
           <option v-for="time in startOptions" :key="time" :value="time">{{ time }}</option>
         </select>
-        <p v-if="errors.start" :id="`${id}-start-error`" role="alert" class="mt-1.5 text-sm text-negative">{{ errors.start }}</p>
+        <p v-if="errors.start" :id="`${id}-start-error`" role="alert" class="mt-1.5 text-callout text-negative">{{ errors.start }}</p>
       </div>
       <div>
-        <label :for="`${id}-end`" class="text-sm font-medium">End</label>
+        <label :for="`${id}-end`" class="text-callout font-medium">End</label>
         <select
           :id="`${id}-end`"
           v-model="endTime"
@@ -116,7 +116,7 @@ const field =
         >
           <option v-for="time in endOptions" :key="time" :value="time">{{ time }}</option>
         </select>
-        <p v-if="errors.end" :id="`${id}-end-error`" role="alert" class="mt-1.5 text-sm text-negative">{{ errors.end }}</p>
+        <p v-if="errors.end" :id="`${id}-end-error`" role="alert" class="mt-1.5 text-callout text-negative">{{ errors.end }}</p>
       </div>
     </div>
   </form>

@@ -42,20 +42,20 @@ function onSubmit(): void {
   <dialog
     ref="dialog"
     :aria-labelledby="titleId"
-    class="m-auto w-[min(30rem,calc(100vw-2rem))] rounded-card bg-surface p-6 text-ink shadow-[0_12px_32px_rgba(0,0,0,0.14)] backdrop:bg-ink/40"
+    class="booking-sheet m-auto w-sheet max-w-sheet rounded-sheet bg-surface p-6 text-ink shadow-sheet sm:p-8"
     @close="emit('close')"
   >
     <form novalidate @submit.prevent="onSubmit">
-      <h2 :id="titleId" class="text-lg font-semibold">Book {{ room.name }}</h2>
-      <p class="mt-0.5 text-sm text-muted">{{ roomFacts }}</p>
+      <h2 :id="titleId" class="text-title1 font-semibold">Book {{ room.name }}</h2>
+      <p class="mt-1 text-subhead text-muted">{{ roomFacts }}</p>
 
       <div class="mt-4 rounded-control bg-data-tint px-4 py-3">
-        <p class="text-2xl font-semibold tracking-tight text-data">{{ formatTimeRange(timeSlot.startTime, timeSlot.endTime) }}</p>
-        <p class="mt-0.5 text-sm text-ink">{{ formatDay(timeSlot.date) }} <span class="whitespace-nowrap text-muted">(Paris time)</span></p>
+        <p class="text-large-title font-semibold text-data">{{ formatTimeRange(timeSlot.startTime, timeSlot.endTime) }}</p>
+        <p class="mt-0.5 text-callout text-ink">{{ formatDay(timeSlot.date) }} <span class="whitespace-nowrap text-muted">(Paris time)</span></p>
       </div>
 
       <div class="mt-5">
-        <label :for="nameId" class="text-sm font-medium">Your name</label>
+        <label :for="nameId" class="text-callout font-medium">Your name</label>
         <input
           :id="nameId"
           ref="nameInput"
@@ -65,22 +65,22 @@ function onSubmit(): void {
           maxlength="80"
           autocomplete="name"
           autofocus
-          class="mt-1.5 block h-11 w-full rounded-control border border-control bg-surface px-3 text-base sm:h-9 sm:text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary aria-[invalid=true]:border-negative"
+          class="mt-1.5 block h-11 w-full rounded-control border border-control bg-surface px-3.5 text-body sm:h-10 sm:text-subhead focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-primary aria-invalid:border-negative"
           :aria-invalid="nameError ? 'true' : undefined"
           :aria-describedby="nameError ? nameErrorId : undefined"
         >
-        <p v-if="nameError" :id="nameErrorId" class="mt-1.5 text-sm text-negative">{{ nameError }}</p>
+        <p v-if="nameError" :id="nameErrorId" class="mt-1.5 text-callout text-negative">{{ nameError }}</p>
       </div>
 
       <ErrorBanner v-if="bannerError" :code="bannerError.code" class="mt-4" />
 
-      <p class="mt-5 text-sm text-ink">Once confirmed, this slot is yours: no one else can book this room for it.</p>
-      <p class="mt-0.5 text-sm text-muted">Bookings are final and can't be changed or cancelled.</p>
+      <p class="mt-5 text-callout text-ink">Once confirmed, this slot is yours: no one else can book this room for it.</p>
+      <p class="mt-0.5 text-callout text-muted">Bookings are final and can't be changed or cancelled.</p>
 
-      <div class="mt-4 flex justify-end gap-2">
+      <div class="mt-6 flex justify-end gap-2">
         <button
           type="button"
-          class="h-11 sm:h-9 rounded-control border border-control bg-surface px-4 text-sm font-medium hover:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          class="h-11 sm:h-10 rounded-pill bg-raised px-4 text-callout font-medium text-ink hover:bg-line transition-transform duration-100 ease-out active:scale-97 motion-reduce:transition-none motion-reduce:active:scale-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           @click="dialog?.close()"
         >
           Cancel
@@ -88,7 +88,7 @@ function onSubmit(): void {
         <button
           type="submit"
           :aria-disabled="submitting"
-          class="h-11 sm:h-9 rounded-control bg-primary px-4 text-sm font-medium text-white hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary aria-disabled:cursor-wait aria-disabled:bg-primary-hover"
+          class="h-11 sm:h-10 rounded-pill bg-primary px-5 text-callout font-medium text-white hover:bg-primary-hover transition-transform duration-100 ease-out active:scale-97 motion-reduce:transition-none motion-reduce:active:scale-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary aria-disabled:cursor-wait aria-disabled:bg-primary-hover aria-disabled:active:scale-100"
         >
           <template v-if="submitting">Booking…</template>
           <template v-else>Confirm booking<span class="hidden sm:inline"> · {{ formatTimeRange(timeSlot.startTime, timeSlot.endTime) }}</span></template>
@@ -97,3 +97,45 @@ function onSubmit(): void {
     </form>
   </dialog>
 </template>
+
+<style scoped>
+/*
+ * The sheet grows into place on a critically damped curve while the blurred scrim fades in behind it.
+ * The sheet itself stays opaque so its text keeps full contrast from the first frame.
+ */
+.booking-sheet[open] {
+  transform: scale(1);
+  transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+
+  @starting-style {
+    transform: scale(0.96);
+  }
+}
+
+.booking-sheet[open]::backdrop {
+  background-color: rgb(0 0 0 / 0.32);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 1;
+  transition: opacity 0.3s ease-out;
+
+  @starting-style {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .booking-sheet[open] {
+    transform: none;
+    transition: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .booking-sheet[open]::backdrop {
+    background-color: rgb(0 0 0 / 0.5);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+</style>
