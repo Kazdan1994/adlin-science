@@ -1,1 +1,51 @@
 @import "tailwindcss";
+
+/* Geist, self-hosted so the CSP keeps fonts on 'self'. One variable file covers weights 400-700. */
+@font-face {
+  font-family: "Geist";
+  src: url("/fonts/Geist-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/*
+ * Achromatic ledger: no colour in the chrome, near-black for actions, and one data hue
+ * (--color-data) kept for the slot being booked. The ground is a blue-grey ledger tint.
+ */
+@theme {
+  --font-sans: "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --color-ground: #f2f4f7;
+  --color-surface: #ffffff;
+  --color-raised: #eeeeee;
+  --color-line: #e6e6e6;
+  --color-rule: #f0f0f0;
+  --color-control: #d4d4d4;
+  --color-ink: #0a0a0a;
+  --color-muted: #5f6368;
+  --color-primary: #141414;
+  --color-primary-hover: #2e2e2e;
+  --color-data: #1d5fbf;
+  --color-data-tint: #e8effa;
+  --color-positive: #247b50;
+  --color-negative: #c4242a;
+  --color-negative-ink: #831c1e;
+  --color-negative-tint: #ffedea;
+
+  --radius-card: 8px;
+  --radius-control: 6px;
+}
+
+@layer base {
+  html {
+    color: var(--color-ink);
+    background-color: var(--color-ground);
+    font-variant-numeric: tabular-nums;
+  }
+
+  ::selection {
+    background-color: var(--color-data-tint);
+    color: var(--color-ink);
+  }
+}
