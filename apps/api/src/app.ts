@@ -17,7 +17,7 @@ export interface AppDeps {
   now: () => Date
 }
 
-export function createApp({ database, config, logger }: AppDeps): Express {
+export function createApp({ database, config, logger, now }: AppDeps): Express {
   const app = express()
   app.set('query parser', 'simple')
 
@@ -36,7 +36,7 @@ export function createApp({ database, config, logger }: AppDeps): Express {
   app.use('/api', createGlobalLimiter())
   app.use(express.json({ limit: '10kb' }))
 
-  app.use('/api', createRoomsRouter(database))
+  app.use('/api', createRoomsRouter(database, now))
 
   app.use(notFoundHandler)
   app.use(errorHandler)

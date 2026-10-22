@@ -17,6 +17,14 @@ export async function listRooms(rooms: Collection<RoomDoc>): Promise<Room[]> {
   return docs.map(toRoom)
 }
 
+export async function listRoomsExcluding(rooms: Collection<RoomDoc>, excludedSlugs: readonly string[]): Promise<Room[]> {
+  const docs = await rooms
+    .find({ slug: { $nin: [...excludedSlugs] } })
+    .sort({ capacity: 1, name: 1 })
+    .toArray()
+  return docs.map(toRoom)
+}
+
 export async function findBySlug(rooms: Collection<RoomDoc>, slug: string): Promise<Room | null> {
   const doc = await rooms.findOne({ slug })
   return doc ? toRoom(doc) : null

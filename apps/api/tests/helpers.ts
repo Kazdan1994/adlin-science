@@ -17,6 +17,10 @@ export interface TestApp {
   stop: () => Promise<void>
 }
 
+export function bodyOf<T>(response: { body: unknown }): T {
+  return response.body as T
+}
+
 export async function startTestApp(): Promise<TestApp> {
   const mongo = await MongoMemoryServer.create()
   const mongoUri = mongo.getUri()

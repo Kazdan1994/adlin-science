@@ -110,7 +110,7 @@ search 10:00–11:00 again: "Salle #2" absent, the other four present; 11:00–1
 
 ### Tests for User Story 1 ⚠️ write first, confirm they fail
 
-- [ ] T034 [P] [US1] Write contract test `apps/api/tests/contract/available.test.ts`: `GET /api/rooms/available?start=2026-11-03T09:00:00.000Z&end=2026-11-03T10:00:00.000Z` → 200 with all 5 rooms; 400 `VALIDATION_ERROR` with a `fields` entry for: end ≤ start, start before the fixed clock, `09:07Z`, Paris-midnight crossing (`2026-11-03T22:00:00.000Z` → `2026-11-03T23:15:00.000Z`), start beyond 90 days, missing `start`, unknown param `foo=1`, `start[$gt]=x`; no 400 body contains a stack trace, file path or driver message
+- [X] T034 [P] [US1] Write contract test `apps/api/tests/contract/available.test.ts`: `GET /api/rooms/available?start=2026-11-03T09:00:00.000Z&end=2026-11-03T10:00:00.000Z` → 200 with all 5 rooms; 400 `VALIDATION_ERROR` with a `fields` entry for: end ≤ start, start before the fixed clock, `09:07Z`, Paris-midnight crossing (`2026-11-03T22:00:00.000Z` → `2026-11-03T23:15:00.000Z`), start beyond 90 days, missing `start`, unknown param `foo=1`, `start[$gt]=x`; no 400 body contains a stack trace, file path or driver message
 - [ ] T035 [P] [US1] Write contract test `apps/api/tests/contract/bookings.test.ts`: `POST /api/bookings` → 201 with `booking` matching the contract (`id` is 24 hex chars, `room: { slug, name }`); 400 for empty, whitespace-only, 81-char and control-character `bookerName`, extra field, `roomSlug` as object, malformed JSON; 404 `ROOM_NOT_FOUND` for `salle-inconnue`; 409 `SLOT_TAKEN` for the identical slot and for a partial overlap (09:30–10:30); 201 for back-to-back (10:00–11:00); 413 for a body over 10 kB; 415 for `text/plain`; after a booking, `GET /api/rooms/available` omits the room for equal and overlapping slots and lists it for the back-to-back slot (SC-002)
 - [ ] T036 [P] [US1] Write test `apps/api/tests/contract/bookings-rate-limit.test.ts` (fresh app instance): the 11th `POST /api/bookings` from one client within a minute → 429 `RATE_LIMITED` envelope (FR-018)
 - [ ] T037 [P] [US1] Write test `apps/api/tests/integration/concurrency.test.ts`: 20 parallel identical `POST /api/bookings` → exactly one 201 and nineteen 409 `SLOT_TAKEN`; `bookings` collection holds 1 document (FR-010, SC-003, research R1)
@@ -122,9 +122,9 @@ search 10:00–11:00 again: "Salle #2" absent, the other four present; 11:00–1
 
 - [ ] T041 [US1] Add `bookings` indexes to `ensureIndexes()` in `apps/api/src/db.ts`: `{ roomSlug: 1, slotStarts: 1 }` **unique**, named `roomSlug_slotStarts`; `{ start: 1, end: 1 }`
 - [ ] T042 [US1] Implement `apps/api/src/bookings/repository.ts`: `insertBooking(doc)` with `writeConcern: { w: 1, j: true }`, mapping a duplicate-key error (code 11000) on `roomSlug_slotStarts` to `slotTaken()`; `bookedRoomSlugs(start, end)` = `distinct('roomSlug', { start: { $lt: end }, end: { $gt: start } })`
-- [ ] T043 [US1] Implement `apps/api/src/rooms/availability.ts` `listAvailable({ start, end }, now)`: `validateSlot` (shared) → `validationError(fields)`; rooms whose `slug` is not in `bookedRoomSlugs`, sorted by capacity then name
+- [X] T043 [US1] Implement `apps/api/src/rooms/availability.ts` `listAvailable({ start, end }, now)`: `validateSlot` (shared) → `validationError(fields)`; rooms whose `slug` is not in `bookedRoomSlugs`, sorted by capacity then name
 - [ ] T044 [US1] Implement `apps/api/src/bookings/service.ts` `createBooking(input, now)`: `validateSlot` → 400; `findBySlug` → 404 `roomNotFound()`; `slotStarts = expandSlotStarts(start, end)`; insert `{ roomSlug, start, end, slotStarts, bookerName, createdAt: now }`; return the public `Booking` (`id` as hex, ISO strings, `room: { slug, name }`)
-- [ ] T045 [US1] Add `GET /rooms/available` to `apps/api/src/rooms/routes.ts` using `parseQuery(availableRoomsQuerySchema, req.query)` and `listAvailable` so T034 passes
+- [X] T045 [US1] Add `GET /rooms/available` to `apps/api/src/rooms/routes.ts` using `parseQuery(availableRoomsQuerySchema, req.query)` and `listAvailable` so T034 passes
 - [ ] T046 [US1] Add `bookingLimiter` (10 requests per minute per IP, same 429 envelope) to `apps/api/src/http/rate-limit.ts`; implement `apps/api/src/bookings/routes.ts` `POST /bookings` (415 `unsupportedMediaType()` unless `req.is('application/json')`, `parseBody(createBookingRequestSchema)`, `createBooking`, respond 201 `{ booking }`) and mount it in `apps/api/src/app.ts` so T035–T038 pass
 - [ ] T047 [P] [US1] Implement `apps/web/app/composables/useAvailability.ts`: criteria `{ date, startTime, endTime }` initialized from shared `defaultSlot(new Date())`, converted with `toUtcInstant`; `status: 'idle' | 'loading' | 'success' | 'error'`, `rooms`, `error`; `search()` and `refresh()` (same criteria); runs the first search on mount
 - [ ] T048 [P] [US1] Implement `apps/web/app/composables/useBooking.ts`: `submit(room, slot, bookerName)` calling `createBooking`; `status`, `booking`, `error` (with `fields` for the name input)
@@ -277,8 +277,8 @@ Stacked branches, each mergeable alone; lockfiles and generated files do not cou
 | 1 | T001–T016 | Workspace, toolchain, shared domain + tests |
 | 2a | T008, T017–T022 | `apps/api` scaffold, config, db, HTTP error/validation/rate-limit infrastructure |
 | 2b | T023–T029 | Test helpers, room seeding, `GET /api/rooms`, health, app factory, server |
-| 3a | T034–T038 | API availability, bookings, concurrency, restart and rate-limit tests |
-| 3b | T041–T046 | Booking indexes, repository, availability, service, routes |
+| 3a | T034, T043, T045, `bookedRoomSlugs` from T042 | `GET /api/rooms/available` with its contract test |
+| 3b | T035–T038, T041, T042 (insert), T044, T046 | `POST /api/bookings`: indexes, insert, service, rate limit, contract, concurrency and restart tests |
 | 4a | T009, T030–T033 | `apps/web` scaffold, Nuxt config with CSP, API client, error messages, page shell |
 | 4b | T047, T049–T052 | Search form, room list and states |
 | 5 | T039–T040, T048, T053–T056 | Booking dialog, confirmation, e2e MVP |
