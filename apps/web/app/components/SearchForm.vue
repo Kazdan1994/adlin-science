@@ -81,18 +81,19 @@ function onSubmit(): void {
 }
 
 const field =
-  'mt-1 block w-full rounded-md border border-slate-400 bg-white px-3 py-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 aria-[invalid=true]:border-red-700'
+  'mt-1.5 block h-9 w-full rounded-control border border-control bg-surface px-3 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary aria-[invalid=true]:border-negative'
 </script>
 
 <template>
-  <form class="rounded-lg border border-slate-200 bg-white p-4" novalidate @submit.prevent="onSubmit">
-    <div class="grid gap-4 sm:grid-cols-3">
-      <div>
-        <label :for="`${id}-date`" class="font-medium">Date</label>
+  <form novalidate :aria-labelledby="`${id}-title`" @submit.prevent="onSubmit">
+    <h2 :id="`${id}-title`" class="text-base font-semibold">When</h2>
+    <div class="mt-3 grid grid-cols-2 gap-3">
+      <div class="col-span-2">
+        <label :for="`${id}-date`" class="text-sm font-medium">Date</label>
         <input :id="`${id}-date`" v-model="date" type="date" :min="today" :max="maxDate" required :class="field">
       </div>
       <div>
-        <label :for="`${id}-start`" class="font-medium">Start</label>
+        <label :for="`${id}-start`" class="text-sm font-medium">Start</label>
         <select
           :id="`${id}-start`"
           v-model="startTime"
@@ -102,10 +103,10 @@ const field =
         >
           <option v-for="time in startOptions" :key="time" :value="time">{{ time }}</option>
         </select>
-        <p v-if="errors.start" :id="`${id}-start-error`" class="mt-1 text-sm text-red-800">{{ errors.start }}</p>
+        <p v-if="errors.start" :id="`${id}-start-error`" class="mt-1.5 text-sm text-negative">{{ errors.start }}</p>
       </div>
       <div>
-        <label :for="`${id}-end`" class="font-medium">End</label>
+        <label :for="`${id}-end`" class="text-sm font-medium">End</label>
         <select
           :id="`${id}-end`"
           v-model="endTime"
@@ -116,7 +117,7 @@ const field =
         >
           <option v-for="time in endOptions" :key="time" :value="time">{{ time }}</option>
         </select>
-        <p v-if="errors.end" :id="`${id}-end-error`" class="mt-1 text-sm text-red-800">{{ errors.end }}</p>
+        <p v-if="errors.end" :id="`${id}-end-error`" class="mt-1.5 text-sm text-negative">{{ errors.end }}</p>
       </div>
     </div>
   </form>

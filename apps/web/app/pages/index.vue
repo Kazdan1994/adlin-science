@@ -2,7 +2,7 @@
 import { type Room, toUtcInstant } from '@adlin/shared'
 
 const { criteria, status, rooms, error, search, setFilters, refresh } = useAvailability()
-const { equipment, maxCapacity } = useRooms()
+const { equipment, maxCapacity, roomCount } = useRooms()
 const { booking, error: bookingError, isSubmitting, submit, reset } = useBooking()
 const selectedRoom = ref<Room | null>(null)
 const conflictRoom = ref<Room | null>(null)
@@ -10,6 +10,7 @@ const conflictBanner = useTemplateRef<{ focus: () => void }>('conflictBanner')
 const confirmation = useTemplateRef<{ focus: () => void }>('confirmation')
 const roomList = useTemplateRef<{ focus: () => void }>('roomList')
 const filterPanel = useTemplateRef<{ clear: () => void }>('filterPanel')
+// Layout: 12 columns with a 12px gap, search panel on 4 and results on 8, so both share the column's edges.
 const filtersActive = computed(() => criteria.value.minCapacity !== undefined || criteria.value.equipment.length > 0)
 
 // A conflict message only applies to the search it came from.
@@ -62,24 +63,36 @@ async function confirm(bookerName: string): Promise<void> {
 </script>
 
 <template>
-  <div class="space-y-6">
-    <ErrorBanner v-if="conflictRoom" ref="conflictBanner" code="SLOT_TAKEN" :room-name="conflictRoom.name" />
-    <BookingConfirmation v-if="booking" ref="confirmation" :booking="booking" @another="bookAnother" />
-    <SearchForm :criteria="criteria" @search="search" />
-    <FilterPanel ref="filterPanel" :filters="criteria" :equipment-options="equipment" :max-capacity="maxCapacity" @update="setFilters" />
-    <RoomList
-      ref="roomList"
-      :status="status"
-      :rooms="rooms"
-      :error="error"
-      :filtered="filtersActive"
-      :time-slot="criteria"
-      :min-capacity="criteria.minCapacity"
-      :max-capacity="maxCapacity"
-      @book="openDialog"
-      @retry="refresh"
-      @clear="clearFilters"
-    />
+  <div class="grid grid-cols-1 items-start gap-3 lg:grid-cols-12">
+    <aside aria-label="Search" class="rounded-card border border-line bg-surface p-5 lg:sticky lg:top-6 lg:col-span-4">
+      <SearchForm :criteria="criteria" @search="search" />
+      <FilterPanel
+        ref="filterPanel"
+        :filters="criteria"
+        :equipment-options="equipment"
+        :max-capacity="maxCapacity"
+        class="mt-5 border-t border-rule pt-5"
+        @update="setFilters"
+      />
+    </aside>
+    <div class="grid grid-cols-1 gap-3 lg:col-span-8">
+      <ErrorBanner v-if="conflictRoom" ref="conflictBanner" code="SLOT_TAKEN" :room-name="conflictRoom.name" />
+      <BookingConfirmation v-if="booking" ref="confirmation" :booking="booking" @another="bookAnother" />
+      <RoomList
+        ref="roomList"
+        :status="status"
+        :rooms="rooms"
+        :error="error"
+        :filtered="filtersActive"
+        :time-slot="criteria"
+        :min-capacity="criteria.minCapacity"
+        :max-capacity="maxCapacity"
+        :room-count="roomCount"
+        @book="openDialog"
+        @retry="refresh"
+        @clear="clearFilters"
+      />
+    </div>
     <BookingDialog
       v-if="selectedRoom"
       :room="selectedRoom"

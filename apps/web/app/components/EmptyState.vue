@@ -12,12 +12,12 @@ const message = computed(() => {
 </script>
 
 <template>
-  <div class="rounded-lg border border-dashed border-slate-300 bg-white p-6 text-center">
-    <p class="font-medium">{{ message }}</p>
+  <div class="flex flex-col items-start gap-3 rounded-card border border-dashed border-control px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between">
+    <p class="text-sm">{{ message }}</p>
     <button
       v-if="filtered"
       type="button"
-      class="mt-4 rounded-md border border-slate-500 px-4 py-2 font-medium hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
+      class="h-8 shrink-0 rounded-control border border-control bg-surface px-3 text-sm font-medium hover:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
       @click="$emit('clear')"
     >
       Remove filters

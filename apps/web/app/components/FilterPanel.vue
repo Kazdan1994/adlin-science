@@ -17,6 +17,9 @@ const seatsError = ref<string | null>(null)
 const seatsText = ref(props.filters.minCapacity?.toString() ?? '')
 const seatsInput = useTemplateRef<HTMLInputElement>('seatsInput')
 const active = computed(() => props.filters.minCapacity !== undefined || props.filters.equipment.length > 0)
+const activeCount = computed(() => (props.filters.minCapacity !== undefined ? 1 : 0) + props.filters.equipment.length)
+// On a phone the filters fold away so the first rooms show on the first screen.
+const open = ref(false)
 
 function onSeatsChange(): void {
   const raw = seatsText.value.trim()
@@ -56,11 +59,24 @@ defineExpose({ clear })
 </script>
 
 <template>
-  <fieldset class="rounded-lg border border-slate-200 bg-white p-4">
-    <legend class="px-1 font-medium">Filter rooms</legend>
-    <div class="grid gap-4 sm:grid-cols-[12rem_1fr]">
+  <div>
+    <div class="flex items-center justify-between gap-3">
+      <h2 :id="`${id}-title`" class="text-base font-semibold">
+        Filters <span v-if="activeCount > 0" class="font-normal text-muted">({{ activeCount }})</span>
+      </h2>
+      <button
+        type="button"
+        class="h-8 rounded-control px-2 text-sm font-medium hover:bg-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary lg:hidden"
+        :aria-expanded="open"
+        :aria-controls="`${id}-body`"
+        @click="open = !open"
+      >
+        {{ open ? 'Hide filters' : 'Show filters' }}
+      </button>
+    </div>
+    <fieldset :id="`${id}-body`" :aria-labelledby="`${id}-title`" class="mt-3 space-y-4" :class="open ? 'block' : 'hidden lg:block'">
       <div>
-        <label :for="`${id}-seats`" class="font-medium">Minimum seats</label>
+        <label :for="`${id}-seats`" class="text-sm font-medium">Minimum seats</label>
         <input
           :id="`${id}-seats`"
           ref="seatsInput"
@@ -71,23 +87,23 @@ defineExpose({ clear })
           step="1"
           placeholder="Any"
           :value="seatsText"
-          class="mt-1 block w-full rounded-md border border-slate-400 bg-white px-3 py-2 placeholder:text-slate-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 aria-[invalid=true]:border-red-700"
+          class="mt-1.5 block h-9 w-full rounded-control border border-control bg-surface px-3 text-sm placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary aria-[invalid=true]:border-negative"
           :aria-invalid="seatsError ? 'true' : undefined"
           :aria-describedby="`${id}-seats-hint`"
           @input="seatsText = ($event.target as HTMLInputElement).value"
           @change="onSeatsChange"
         >
-        <p :id="`${id}-seats-hint`" class="mt-1 text-sm" :class="seatsError ? 'text-red-800' : 'text-slate-700'">
+        <p :id="`${id}-seats-hint`" class="mt-1.5 text-sm" :class="seatsError ? 'text-negative' : 'text-muted'">
           {{ seatsError ?? (maxCapacity > 0 ? `The largest room seats ${maxCapacity}.` : '') }}
         </p>
       </div>
       <fieldset v-if="equipmentOptions.length > 0">
-        <legend class="font-medium">Equipment</legend>
-        <div class="mt-1 flex flex-wrap gap-x-5 gap-y-2">
-          <label v-for="name in equipmentOptions" :key="name" class="flex items-center gap-2">
+        <legend class="text-sm font-medium">Equipment</legend>
+        <div class="mt-2 grid gap-2">
+          <label v-for="name in equipmentOptions" :key="name" class="flex items-center gap-2.5 text-sm">
             <input
               type="checkbox"
-              class="h-5 w-5 accent-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
+              class="h-4 w-4 accent-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               :checked="filters.equipment.includes(name)"
               @change="toggleEquipment(name, ($event.target as HTMLInputElement).checked)"
             >
@@ -95,14 +111,14 @@ defineExpose({ clear })
           </label>
         </div>
       </fieldset>
-    </div>
-    <button
-      type="button"
-      :disabled="!active"
-      class="mt-4 rounded-md border border-slate-500 px-4 py-2 font-medium hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
-      @click="clearFromPanel"
-    >
-      Clear filters
-    </button>
-  </fieldset>
+      <button
+        type="button"
+        :disabled="!active"
+        class="h-8 rounded-control border border-control bg-surface px-3 text-sm font-medium hover:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:border-line disabled:bg-transparent disabled:text-muted"
+        @click="clearFromPanel"
+      >
+        Clear filters
+      </button>
+    </fieldset>
+  </div>
 </template>
