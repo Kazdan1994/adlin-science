@@ -42,7 +42,7 @@ folders (`packages/`, `apps/`, `e2e/`) before T001.
 - [X] T005 [P] Create `.env.example` with `MONGO_ROOT_USERNAME=adlin`, `MONGO_ROOT_PASSWORD=change-me`, `MONGODB_URI=mongodb://adlin:change-me@127.0.0.1:27017/?authSource=admin`, `MONGODB_DB=adlin`, `PORT=4000`, `WEB_ORIGIN=http://localhost:3000`, `NUXT_PUBLIC_API_BASE=http://localhost:4000/api`, `LOG_LEVEL=info`
 - [X] T006 [P] Create `docker-compose.yml` with a single `mongo` service: image `mongo:8`, root credentials from `.env`, named volume `mongo-data`, port `127.0.0.1:27017:27017` (local only), healthcheck `mongosh --quiet --eval "db.adminCommand('ping')"`
 - [X] T007 [P] Scaffold `packages/shared/`: `package.json` (name `@adlin/shared`, `"type": "module"`, `exports` → `./dist/index.js` + types, scripts `build: tsc -p tsconfig.json`, `test: vitest run`, `typecheck: tsc --noEmit`; deps `zod@^4`, `date-fns@^4`, `@date-fns/tz`), `tsconfig.json` extending the base (`rootDir: src`, `outDir: dist`), empty `src/index.ts`
-- [ ] T008 [P] Scaffold `apps/api/`: `package.json` (name `@adlin/api`, `"type": "module"`; deps `express@^5`, `mongodb@^7`, `zod@^4`, `helmet@^8`, `cors`, `express-rate-limit@^8`, `pino@^10`, `pino-http@^11`, `@adlin/shared`; devDeps `tsx`, `supertest@^7`, `@types/express`, `@types/cors`, `@types/supertest`, `mongodb-memory-server@^11`; scripts `dev: tsx watch --env-file=../../.env src/server.ts`, `build: tsc`, `start: node dist/server.js`, `test: vitest run`, `typecheck: tsc --noEmit`), `tsconfig.json`, `vitest.config.ts` (`testTimeout: 30000`, `hookTimeout: 60000`) (deferred from slice 1 to keep the PR within budget)
+- [X] T008 [P] Scaffold `apps/api/`: `package.json` (name `@adlin/api`, `"type": "module"`; deps `express@^5`, `mongodb@^7`, `zod@^4`, `helmet@^8`, `cors`, `express-rate-limit@^8`, `pino@^10`, `pino-http@^11`, `@adlin/shared`; devDeps `tsx`, `supertest@^7`, `@types/express`, `@types/cors`, `@types/supertest`, `mongodb-memory-server@^11`; scripts `dev: tsx watch --env-file=../../.env src/server.ts`, `start: tsx src/server.ts` (no `build`: `@adlin/shared` ships TypeScript source, so the API runs through `tsx`), `test: vitest run`, `typecheck: tsc --noEmit`), `tsconfig.json`, `vitest.config.ts` (`testTimeout: 30000`, `hookTimeout: 60000`) (deferred from slice 1 to keep the PR within budget)
 - [ ] T009 [P] Scaffold `apps/web/`: `package.json` (name `@adlin/web`; deps `nuxt@^4`, `vue`, `@adlin/shared`; devDeps `@nuxt/eslint`, `tailwindcss@^4`, `@tailwindcss/vite`, `vue-tsc`; scripts `dev: nuxt dev --port 3000`, `build: nuxt build`, `typecheck: nuxt typecheck`, `lint: eslint .`), minimal `nuxt.config.ts` with `ssr: false`, `app/app.vue` placeholder, `app/assets/css/main.css` containing `@import "tailwindcss";` (deferred from slice 1 to keep the PR within budget)
 - [X] T010 Run `npm install` at the root, commit `package-lock.json`, and confirm `npm run typecheck && npm run lint && npm test && npm run build` passes on the empty scaffold
 
@@ -69,12 +69,12 @@ these.
 
 ### API skeleton
 
-- [ ] T017 [P] Implement `apps/api/src/config.ts`: parse `process.env` with zod (`PORT` default 4000, `MONGODB_URI` required, `MONGODB_DB` default `adlin`, `WEB_ORIGIN` required URL, `ROOMS_FILE` default absolute path to repo-root `salles.json`, `LOG_LEVEL` default `info`); exit with a readable message listing missing/invalid vars
-- [ ] T018 [P] Implement `apps/api/src/db.ts`: `connect(uri, dbName)` returning `{ client, db, rooms, bookings }` with typed collections (`RoomDoc`, `BookingDoc` per data-model.md) and `ensureIndexes()` creating `rooms` `{ slug: 1 }` unique
-- [ ] T019 [P] Implement `apps/api/src/http/errors.ts`: `AppError(status, code, message, fields?)` typed with the shared `ErrorCode`, plus helpers `validationError(fields)`, `roomNotFound()`, `slotTaken()`, `unknownEquipment(names)`, `unsupportedMediaType()`
-- [ ] T020 Implement `apps/api/src/http/validate.ts`: `parseQuery(schema, req.query)` and `parseBody(schema, req.body)` that throw `validationError` with a `fields` map built from zod issues (first path segment → message; unknown keys → "This field is not allowed.") (depends on T016, T019)
-- [ ] T021 Implement `apps/api/src/http/error-handler.ts`: `AppError` → `{ error: { code, message, fields? } }`; body-parser `entity.parse.failed` → 400 `VALIDATION_ERROR` "The request body is not valid JSON."; `entity.too.large` → 413 `PAYLOAD_TOO_LARGE`; anything else → 500 `INTERNAL_ERROR` "Something went wrong on our side. Please try again." and log the full error with the request id; plus a `notFoundHandler` → 404 `NOT_FOUND` (depends on T019)
-- [ ] T022 [P] Implement `apps/api/src/http/rate-limit.ts` with `globalLimiter` (`express-rate-limit`, 300 requests per minute per IP, `standardHeaders: 'draft-8'`, `legacyHeaders: false`, handler returning 429 `RATE_LIMITED` envelope "Too many requests. Please wait a minute and try again.")
+- [X] T017 [P] Implement `apps/api/src/config.ts` (`loadConfig(env)` throws a readable `ConfigError`; `server.ts` prints it and exits): parse `process.env` with zod (`PORT` default 4000, `MONGODB_URI` required, `MONGODB_DB` default `adlin`, `WEB_ORIGIN` required URL, `ROOMS_FILE` default absolute path to repo-root `salles.json`, `LOG_LEVEL` default `info`); exit with a readable message listing missing/invalid vars
+- [X] T018 [P] Implement `apps/api/src/db.ts`: `connect(uri, dbName)` returning `{ client, db, rooms, bookings }` with typed collections (`RoomDoc`, `BookingDoc` per data-model.md) and `ensureIndexes()` creating `rooms` `{ slug: 1 }` unique
+- [X] T019 [P] Implement `apps/api/src/http/errors.ts`: `AppError(status, code, message, fields?)` typed with the shared `ErrorCode`, plus helpers `validationError(fields)`, `roomNotFound()`, `slotTaken()`, `unknownEquipment(names)`, `unsupportedMediaType()`
+- [X] T020 Implement `apps/api/src/http/validate.ts`: `parseQuery(schema, req.query)` and `parseBody(schema, req.body)` that throw `validationError` with a `fields` map built from zod issues (first path segment → message; unknown keys → "This field is not allowed.") (depends on T016, T019)
+- [X] T021 Implement `apps/api/src/http/error-handler.ts`: `AppError` → `{ error: { code, message, fields? } }`; body-parser `entity.parse.failed` → 400 `VALIDATION_ERROR` "The request body is not valid JSON."; `entity.too.large` → 413 `PAYLOAD_TOO_LARGE`; anything else → 500 `INTERNAL_ERROR` "Something went wrong on our side. Please try again." and log the full error with the request id; plus a `notFoundHandler` → 404 `NOT_FOUND` (depends on T019)
+- [X] T022 [P] Implement `apps/api/src/http/rate-limit.ts` with `createGlobalLimiter()` (a factory so each app instance has its own counters; `express-rate-limit`, 300 requests per minute per IP, `standardHeaders: 'draft-8'`, `legacyHeaders: false`, handler returning 429 `RATE_LIMITED` envelope "Too many requests. Please wait a minute and try again.")
 - [ ] T023 Create `apps/api/tests/helpers.ts`: start one `MongoMemoryServer` per test file, build the app via `createApp` with a fixed clock (`now = 2026-11-02T08:00:00.000Z`), seed rooms from repo-root `salles.json`, expose `request` (Supertest), `clearBookings()`, `stop()`
 
 ### Room catalogue: tests first
@@ -191,7 +191,7 @@ confirmation, one "just taken" message followed by a list without "Salle #1".
 
 **Purpose**: One-command run, accessibility evidence, docs, final checks.
 
-- [ ] T067 [P] Create `apps/api/Dockerfile`: multi-stage on `node:24-alpine`, `npm ci` with workspaces, build `@adlin/shared` then `@adlin/api`, copy `salles.json`, set `ROOMS_FILE`, run `node dist/server.js` as the non-root `node` user
+- [ ] T067 [P] Create `apps/api/Dockerfile`: multi-stage on `node:24-alpine`, `npm ci` with workspaces, copy `salles.json`, set `ROOMS_FILE`, run `npx tsx apps/api/src/server.ts` as the non-root `node` user
 - [ ] T068 [P] Create `apps/web/Dockerfile`: multi-stage on `node:24-alpine`, build `@adlin/shared` then `nuxt build` with `NUXT_PUBLIC_API_BASE` as a build arg, run `node .output/server/index.mjs` as the non-root `node` user on port 3000
 - [ ] T069 Extend `docker-compose.yml` with `api` (build `apps/api/Dockerfile`, env from `.env` with `MONGODB_URI` pointing at `mongo`, `depends_on: mongo: condition: service_healthy`, port `4000:4000`, healthcheck on `/api/health`) and `web` (build `apps/web/Dockerfile`, port `3000:3000`, depends on `api`); `docker compose up --build` starts everything (depends on T067, T068)
 - [ ] T070 [P] Write `e2e/accessibility.spec.ts`: complete search → book with keyboard only (Tab/Enter/Space/Esc); `@axe-core/playwright` scan of the page and the open dialog reports zero `serious`/`critical` violations, including `color-contrast` (SC-007); with `reducedMotion: 'reduce'` the confirmation appears with no running animation; at a 360 px viewport `document.documentElement.scrollWidth <= 360` (FR-019)
@@ -275,9 +275,12 @@ Stacked branches, each mergeable alone; lockfiles and generated files do not cou
 | Slice | Tasks | Content |
 |-------|-------|---------|
 | 1 | T001–T016 | Workspace, toolchain, shared domain + tests |
-| 2 | T017–T029 | API skeleton, room seeding, `GET /api/rooms`, health |
-| 3 | T034–T038, T041–T046 | API availability + bookings + concurrency/restart/rate-limit tests |
-| 4 | T030–T033, T047, T049–T052 | Web shell, search form, room list and states |
+| 2a | T008, T017–T022 | `apps/api` scaffold, config, db, HTTP error/validation/rate-limit infrastructure |
+| 2b | T023–T029 | Test helpers, room seeding, `GET /api/rooms`, health, app factory, server |
+| 3a | T034–T038 | API availability, bookings, concurrency, restart and rate-limit tests |
+| 3b | T041–T046 | Booking indexes, repository, availability, service, routes |
+| 4a | T009, T030–T033 | `apps/web` scaffold, Nuxt config with CSP, API client, error messages, page shell |
+| 4b | T047, T049–T052 | Search form, room list and states |
 | 5 | T039–T040, T048, T053–T056 | Booking dialog, confirmation, e2e MVP |
 | 6 | T057–T063 | US2 filters (API + UI) |
 | 7 | T064–T066 | US3 conflict recovery |
