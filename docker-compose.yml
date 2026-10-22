@@ -14,5 +14,40 @@ services:
       timeout: 5s
       retries: 10
 
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      MONGODB_URI: mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongo:27017/?authSource=admin
+      MONGODB_DB: ${MONGODB_DB:-adlin}
+      PORT: 4000
+      WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost:3000}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    depends_on:
+      mongo:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:4000:4000"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:4000/api/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        NUXT_PUBLIC_API_BASE: ${NUXT_PUBLIC_API_BASE:-http://localhost:4000/api}
+    environment:
+      NUXT_PUBLIC_API_BASE: ${NUXT_PUBLIC_API_BASE:-http://localhost:4000/api}
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:3000:3000"
+
 volumes:
   mongo-data:
