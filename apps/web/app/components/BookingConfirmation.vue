@@ -7,7 +7,8 @@ defineEmits<{ another: [] }>()
 const heading = useTemplateRef<HTMLElement>('heading')
 const headingId = useId()
 
-onMounted(() => heading.value?.focus())
+// Focused by the page once the booking dialog has closed, because the modal makes the page inert.
+defineExpose({ focus: () => heading.value?.focus() })
 </script>
 
 <template>

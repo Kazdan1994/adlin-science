@@ -1,5 +1,5 @@
 import { MongoMemoryServer } from 'mongodb-memory-server'
-import { pino } from 'pino'
+import { type Logger, pino } from 'pino'
 import supertest from 'supertest'
 import { createApp } from '../src/app'
 import { loadConfig } from '../src/config'
@@ -19,6 +19,8 @@ export interface TestApp {
 }
 
 export interface TestAppOptions {
+  /** Defaults to a silent logger. */
+  logger?: Logger
   /** Keep the real 10-per-minute booking limit. Off by default so bulk POST tests do not trip it. */
   productionRateLimits?: boolean
 }
@@ -45,7 +47,7 @@ async function buildTestApp(mongo: MongoMemoryServer, options: TestAppOptions): 
     database,
     config,
     now: () => FIXED_NOW,
-    logger: pino({ level: 'silent' }),
+    logger: options.logger ?? pino({ level: 'silent' }),
     ...(options.productionRateLimits ? {} : { bookingRateLimit: RELAXED_BOOKING_LIMIT }),
   })
 

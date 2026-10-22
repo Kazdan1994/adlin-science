@@ -7,6 +7,7 @@ const { booking, error: bookingError, isSubmitting, submit, reset } = useBooking
 const selectedRoom = ref<Room | null>(null)
 const conflictRoom = ref<Room | null>(null)
 const conflictBanner = useTemplateRef<{ focus: () => void }>('conflictBanner')
+const confirmation = useTemplateRef<{ focus: () => void }>('confirmation')
 const filtersActive = computed(() => criteria.value.minCapacity !== undefined || criteria.value.equipment.length > 0)
 
 // A conflict message only applies to the search it came from.
@@ -30,6 +31,8 @@ async function confirm(bookerName: string): Promise<void> {
   await submit(room, slot, bookerName)
   if (booking.value) {
     selectedRoom.value = null
+    await nextTick()
+    confirmation.value?.focus()
     await refresh()
     return
   }
@@ -46,7 +49,7 @@ async function confirm(bookerName: string): Promise<void> {
 <template>
   <div class="space-y-6">
     <ErrorBanner v-if="conflictRoom" ref="conflictBanner" code="SLOT_TAKEN" :room-name="conflictRoom.name" />
-    <BookingConfirmation v-if="booking" :booking="booking" @another="reset" />
+    <BookingConfirmation v-if="booking" ref="confirmation" :booking="booking" @another="reset" />
     <SearchForm :criteria="criteria" :busy="status === 'loading'" @search="search" />
     <FilterPanel :filters="criteria" :equipment-options="equipment" :max-capacity="maxCapacity" @update="setFilters" />
     <RoomList

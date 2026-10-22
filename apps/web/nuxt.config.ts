@@ -6,6 +6,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2026-10-01',
   ssr: false,
   devtools: { enabled: false },
+  app: { head: { title: 'Book a meeting room', htmlAttrs: { lang: 'en' } } },
   modules: ['@nuxt/eslint'],
   css: ['~/assets/css/main.css'],
   vite: { plugins: [tailwindcss()] },
