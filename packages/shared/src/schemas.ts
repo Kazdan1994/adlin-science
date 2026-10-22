@@ -39,6 +39,10 @@ export const bookingSchema = z.object({
   createdAt: instantSchema,
 })
 
+export const roomListResponseSchema = z.object({ rooms: z.array(roomSchema), equipment: z.array(z.string()) })
+export const availableRoomsResponseSchema = z.object({ rooms: z.array(roomSchema) })
+export const createBookingResponseSchema = z.object({ booking: bookingSchema })
+
 export const errorCodeSchema = z.enum([
   'VALIDATION_ERROR',
   'UNKNOWN_EQUIPMENT',
@@ -64,5 +68,8 @@ export type Room = z.infer<typeof roomSchema>
 export type Booking = z.infer<typeof bookingSchema>
 export type CreateBookingRequest = z.infer<typeof createBookingRequestSchema>
 export type AvailableRoomsQuery = z.infer<typeof availableRoomsQuerySchema>
+export type RoomListResponse = z.infer<typeof roomListResponseSchema>
+export type AvailableRoomsResponse = z.infer<typeof availableRoomsResponseSchema>
+export type CreateBookingResponse = z.infer<typeof createBookingResponseSchema>
 export type ErrorCode = z.infer<typeof errorCodeSchema>
 export type ErrorEnvelope = z.infer<typeof errorEnvelopeSchema>

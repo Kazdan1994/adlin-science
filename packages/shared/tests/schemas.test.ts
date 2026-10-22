@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import {
   availableRoomsQuerySchema,
+  availableRoomsResponseSchema,
   bookerNameSchema,
   createBookingRequestSchema,
+  createBookingResponseSchema,
   errorCodeSchema,
+  roomListResponseSchema,
   roomSlugSchema,
 } from '../src/schemas'
 
@@ -87,5 +90,28 @@ describe('errorCodeSchema', () => {
       'SERVICE_UNAVAILABLE',
       'INTERNAL_ERROR',
     ])
+  })
+})
+
+describe('response schemas', () => {
+  const room = { slug: 'salle-1', name: 'Salle #1', description: 'Salle #1', capacity: 5, equipment: ['TV'] }
+  const booking = {
+    id: 'a'.repeat(24),
+    room: { slug: 'salle-1', name: 'Salle #1' },
+    start: '2026-11-03T09:00:00.000Z',
+    end: '2026-11-03T10:00:00.000Z',
+    bookerName: 'Alice Martin',
+    createdAt: '2026-11-02T08:00:00.000Z',
+  }
+
+  it('accepts the contract shapes', () => {
+    expect(roomListResponseSchema.safeParse({ rooms: [room], equipment: ['TV'] }).success).toBe(true)
+    expect(availableRoomsResponseSchema.safeParse({ rooms: [room] }).success).toBe(true)
+    expect(createBookingResponseSchema.safeParse({ booking }).success).toBe(true)
+  })
+
+  it('rejects a body that does not match', () => {
+    expect(roomListResponseSchema.safeParse({ rooms: [room] }).success).toBe(false)
+    expect(createBookingResponseSchema.safeParse({ booking: { ...booking, id: 'nope' } }).success).toBe(false)
   })
 })
