@@ -4,9 +4,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Status
 
-Greenfield. No application code, `package.json`, build, lint or test commands exist yet. The repo only
-holds the brief (`README.md`) and Spec Kit scaffolding. Add real commands here once the stack is set up;
-don't invent them.
+The stack is built (feature `001-room-search-booking`, see `specs/001-room-search-booking/tasks.md`).
+npm workspaces: `packages/shared` (zod schemas, Paris time and slot rules), `apps/api` (Express 5 +
+MongoDB), `apps/web` (Nuxt 4 SPA, Tailwind), `e2e` (Playwright).
+
+Commands, from the repo root:
+
+- Run everything: `cp .env.example .env`, then `docker compose up --build` (web :3000, api :4000/api).
+- Gate before a commit: `npm run typecheck && npm run lint && npm test && npm run build`.
+  `npm test` needs no Docker (in-memory MongoDB).
+- End to end: `docker compose up -d mongo`, `docker compose stop api web`, then `npm run test:e2e`.
+  It starts its own api and web on ports 4000 and 3000 against the `adlin_e2e` database.
+- Dependency audit: `npm run audit`. It currently fails on `braces` and `node-forge` (no upstream fix;
+  see the README "Known issue" section).
+
+`@adlin/shared` ships TypeScript source, so the API runs through `tsx`, not a compiled `dist/`.
 
 ## The brief (from README.md, in French)
 
@@ -40,7 +52,6 @@ The project is driven by GitHub Spec Kit (v1.2.3.dev0, `claude` integration, `sh
 
 - Feature specs are written to `specs/NNN-<name>/` (sequential numbering) by
   `.specify/scripts/bash/create-new-feature.sh`.
-- `.specify/memory/constitution.md` is still the unfilled template. Run `/speckit-constitution` before
-  `/speckit-plan`, since plans check against it.
+- `.specify/memory/constitution.md` is filled in (v2.0.0). Plans check against it.
 - Templates in `.specify/templates/` are versioned scaffolding. Don't edit them to change one feature's output.
 - `.specify/feature.json` is per-checkout state (gitignored).

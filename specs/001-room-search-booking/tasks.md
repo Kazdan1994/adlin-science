@@ -196,11 +196,11 @@ confirmation, one "just taken" message followed by a list without "Salle #1".
 - [X] T069 Extend `docker-compose.yml` with `api` (build `apps/api/Dockerfile`, env from `.env` with `MONGODB_URI` pointing at `mongo`, `depends_on: mongo: condition: service_healthy`, port `127.0.0.1:4000:4000`, healthcheck on `/api/health`) and `web` (build `apps/web/Dockerfile`, port `127.0.0.1:3000:3000`, depends on `api`); `docker compose up --build` starts everything (depends on T067, T068)
 - [X] T070 [P] Write `e2e/accessibility.spec.ts`: complete search → book with keyboard only (Tab/Enter/Space/Esc); `@axe-core/playwright` scan of the page and the open dialog reports zero `serious`/`critical` violations, including `color-contrast` (SC-007); with `reducedMotion: 'reduce'` the confirmation appears with no running animation; at a 360 px viewport `document.documentElement.scrollWidth <= 360` (FR-019)
 - [X] T071 [P] Check API logging in `apps/api/src/app.ts` (verified by `apps/api/tests/integration/logging.test.ts`): `pino-http` serializers log method, URL, status, duration and request id only, never request bodies (booker names); 500s log the full error server-side
-- [ ] T072 Write the root `README.md` run and architecture section (keep the existing brief): one-command start, tests, endpoint list linking `specs/001-room-search-booking/contracts/rest-api.yaml`, double-booking guarantee, security measures, and the MongoDB-only storage decision; run it through the humanizer skill
-- [ ] T073 Update the Status section of `CLAUDE.md` with the real commands (`docker compose up --build`, gate, `npm run test:e2e`) now that the stack exists
-- [ ] T074 Run `npm run audit`; resolve any high or critical finding (constitution Principle II)
-- [ ] T075 Run every scenario in `specs/001-room-search-booking/quickstart.md` against `docker compose up --build`, including restart persistence and the two-window manual check; record results in the PR description
-- [ ] T076 Final gate: `npm run typecheck && npm run lint && npm test && npm run build && npm run test:e2e`
+- [X] T072 Write the root `README.md` run and architecture section (keep the existing brief): one-command start, tests, endpoint list linking `specs/001-room-search-booking/contracts/rest-api.yaml`, double-booking guarantee, security measures, and the MongoDB-only storage decision; run it through the humanizer skill
+- [X] T073 Update the Status section of `CLAUDE.md` with the real commands (`docker compose up --build`, gate, `npm run test:e2e`) now that the stack exists
+- [ ] T074 Run `npm run audit`; resolve any high or critical finding (constitution Principle II). **Blocked upstream**: 11 high findings, all from `braces` and `node-forge` via Nuxt's nitropack; no patched release exists and neither package is in the production images. Documented in the README; revisit when fixes ship
+- [X] T075 Run every scenario in `specs/001-room-search-booking/quickstart.md` against `docker compose up --build`, including restart persistence and the two-window manual check; record results in the PR description
+- [X] T076 Final gate: `npm run typecheck && npm run lint && npm test && npm run build && npm run test:e2e`
 
 ---
 

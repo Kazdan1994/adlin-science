@@ -86,7 +86,8 @@ curl -s "localhost:4000/api/rooms/available?start=${D}T09:00:00.000Z&end=${D}T10
 ### 6. End-to-end UI flow (US1, FR-001, FR-014, SC-001, SC-007)
 
 ```bash
-docker compose up -d --build
+docker compose up -d mongo
+docker compose stop api web     # the e2e run starts its own api and web on ports 4000 and 3000
 npm run test:e2e
 ```
 
@@ -96,7 +97,7 @@ with keyboard only.
 
 ### 7. Manual UI checks
 
-- Page label reads "Paris time"; change the OS time zone and confirm times do not shift.
+- Page label reads "Paris time"; change the OS time zone and confirm times do not shift (also checked by `e2e/timezone.spec.ts`).
 - Open two browser windows on the same slot, book the same room in both: the second shows "just
   taken" and a refreshed list without that room.
 - With "reduce motion" enabled in the OS, the confirmation appears without animation.
