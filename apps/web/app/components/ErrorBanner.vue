@@ -1,13 +1,21 @@
 <script setup lang="ts">
 import type { ApiErrorCode } from '~/utils/api'
 
-defineProps<{ code: ApiErrorCode; retryable?: boolean }>()
+defineProps<{ code: ApiErrorCode; roomName?: string; retryable?: boolean }>()
 defineEmits<{ retry: [] }>()
+
+const banner = useTemplateRef<HTMLElement>('banner')
+defineExpose({ focus: () => banner.value?.focus() })
 </script>
 
 <template>
-  <div role="alert" class="flex flex-col gap-3 rounded-lg border border-red-300 bg-red-50 p-4 text-red-900 sm:flex-row sm:items-center sm:justify-between">
-    <p>{{ messageForError(code) }}</p>
+  <div
+    ref="banner"
+    role="alert"
+    tabindex="-1"
+    class="flex flex-col gap-3 rounded-lg border border-red-300 bg-red-50 p-4 text-red-900 sm:flex-row sm:items-center sm:justify-between"
+  >
+    <p>{{ messageForError(code, roomName) }}</p>
     <button
       v-if="retryable"
       type="button"

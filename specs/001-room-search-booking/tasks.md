@@ -176,12 +176,12 @@ confirmation, one "just taken" message followed by a list without "Salle #1".
 
 ### Tests for User Story 3 ⚠️ write first, confirm they fail
 
-- [ ] T064 [US3] Write `e2e/conflict.spec.ts`: context A and B both open tomorrow 14:00–15:00; A books "Salle #1"; B confirms "Salle #1" → alert with the `SLOT_TAKEN` message, dialog closed, list refreshed without "Salle #1", criteria unchanged (FR-011); separately, double-clicking "Confirm booking" yields exactly one confirmation and the button is disabled after the first click
+- [X] T064 [US3] Write `e2e/conflict.spec.ts`: context A and B both open tomorrow 14:00–15:00; A books "Salle #1"; B confirms "Salle #1" → alert with the `SLOT_TAKEN` message, dialog closed, list refreshed without "Salle #1", criteria unchanged (FR-011); separately, double-clicking "Confirm booking" yields exactly one confirmation and the button is disabled after the first click
 
 ### Implementation for User Story 3
 
-- [ ] T065 [US3] In `apps/web/app/composables/useBooking.ts`, ignore `submit` while a request is pending (in-flight guard) and expose `isSubmitting`; in `apps/web/app/components/BookingDialog.vue`, disable "Confirm booking" and set `aria-disabled` while submitting
-- [ ] T066 [US3] In `apps/web/app/pages/index.vue`, on a `SLOT_TAKEN` result close the dialog, show `ErrorBanner` with the conflict message naming the room, move focus to the banner, and call `useAvailability().refresh()` with the same criteria so T064 passes
+- [X] T065 [US3] In `apps/web/app/composables/useBooking.ts`, ignore `submit` while a request is pending (in-flight guard) and expose `isSubmitting`; in `apps/web/app/components/BookingDialog.vue`, set `aria-disabled` on "Confirm booking" while submitting (not the `disabled` attribute, which would drop keyboard focus from the button)
+- [X] T066 [US3] In `apps/web/app/pages/index.vue`, on a `SLOT_TAKEN` result close the dialog, show `ErrorBanner` with the conflict message naming the room, move focus to the banner, and call `useAvailability().refresh()` with the same criteria so T064 passes
 
 **Checkpoint**: All three stories work independently.
 

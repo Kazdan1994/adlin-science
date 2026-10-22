@@ -14,6 +14,10 @@ const MESSAGES: Record<ApiErrorCode, string> = {
   NETWORK: "We can't reach the booking service. Check your connection and try again.",
 }
 
-export function messageForError(code: ApiErrorCode): string {
+/** `roomName` makes the booking conflict message say which room was lost. */
+export function messageForError(code: ApiErrorCode, roomName?: string): string {
+  if (code === 'SLOT_TAKEN' && roomName) {
+    return `Someone just booked ${roomName} for this time. Pick another room below.`
+  }
   return MESSAGES[code]
 }

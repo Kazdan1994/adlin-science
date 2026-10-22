@@ -3,7 +3,7 @@ import { bookerNameSchema, type Room } from '@adlin/shared'
 import type { SlotCriteria } from '~/composables/useAvailability'
 import type { ApiRequestError } from '~/utils/api'
 
-const props = defineProps<{ room: Room; timeSlot: SlotCriteria; error: ApiRequestError | null }>()
+const props = defineProps<{ room: Room; timeSlot: SlotCriteria; error: ApiRequestError | null; submitting: boolean }>()
 const emit = defineEmits<{ confirm: [bookerName: string]; close: [] }>()
 
 const dialog = useTemplateRef<HTMLDialogElement>('dialog')
@@ -20,6 +20,7 @@ const bannerError = computed(() => (props.error && !props.error.fields?.bookerNa
 onMounted(() => dialog.value?.showModal())
 
 function onSubmit(): void {
+  if (props.submitting) return
   const parsed = bookerNameSchema.safeParse(bookerName.value)
   if (!parsed.success) {
     localNameError.value = parsed.error.issues[0]?.message ?? 'Enter your name.'
@@ -75,7 +76,8 @@ function onSubmit(): void {
         </button>
         <button
           type="submit"
-          class="rounded-md bg-blue-700 px-4 py-2 font-medium text-white hover:bg-blue-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
+          :aria-disabled="submitting"
+          class="rounded-md bg-blue-700 px-4 py-2 font-medium text-white hover:bg-blue-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 aria-disabled:cursor-wait aria-disabled:opacity-60"
         >
           Confirm booking
         </button>

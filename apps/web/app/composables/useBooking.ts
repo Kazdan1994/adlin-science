@@ -15,7 +15,10 @@ export function useBooking() {
   const booking = ref<Booking | null>(null)
   const error = ref<ApiRequestError | null>(null)
 
+  const isSubmitting = computed(() => status.value === 'submitting')
+
   async function submit(room: Room, slot: BookingSlot, bookerName: string): Promise<void> {
+    if (isSubmitting.value) return // a second click while the first request is in flight
     status.value = 'submitting'
     error.value = null
     try {
@@ -34,5 +37,5 @@ export function useBooking() {
     error.value = null
   }
 
-  return { status: shallowReadonly(status), booking: shallowReadonly(booking), error: shallowReadonly(error), submit, reset }
+  return { status: shallowReadonly(status), booking: shallowReadonly(booking), error: shallowReadonly(error), isSubmitting, submit, reset }
 }
