@@ -8,10 +8,10 @@ import {
   toUtcInstant,
   validateSlot,
 } from '@adlin/shared'
-import type { SearchCriteria } from '~/composables/useAvailability'
+import type { SlotCriteria } from '~/composables/useAvailability'
 
-const props = defineProps<{ criteria: SearchCriteria; busy: boolean }>()
-const emit = defineEmits<{ search: [criteria: SearchCriteria] }>()
+const props = defineProps<{ criteria: SlotCriteria; busy: boolean }>()
+const emit = defineEmits<{ search: [criteria: SlotCriteria] }>()
 
 const id = useId()
 const today = parisTodayYmd(new Date())

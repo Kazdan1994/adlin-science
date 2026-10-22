@@ -7,6 +7,7 @@ const props = defineProps<{
   status: AvailabilityStatus
   rooms: readonly Room[]
   error: ApiRequestError | null
+  filtered: boolean
 }>()
 defineEmits<{ book: [room: Room]; retry: [] }>()
 
@@ -25,7 +26,7 @@ const liveMessage = computed(() => {
       <li v-for="n in 3" :key="n" class="h-24 animate-pulse rounded-lg bg-slate-200 motion-reduce:animate-none" />
     </ul>
     <ErrorBanner v-else-if="status === 'error' && error" :code="error.code" retryable @retry="$emit('retry')" />
-    <EmptyState v-else-if="status === 'success' && rooms.length === 0" />
+    <EmptyState v-else-if="status === 'success' && rooms.length === 0" :filtered="filtered" />
     <ul v-else-if="status === 'success'" class="space-y-3">
       <RoomCard v-for="room in rooms" :key="room.slug" :room="room" @book="$emit('book', $event)" />
     </ul>

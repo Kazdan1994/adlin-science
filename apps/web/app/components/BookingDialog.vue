@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { bookerNameSchema, type Room } from '@adlin/shared'
-import type { SearchCriteria } from '~/composables/useAvailability'
+import type { SlotCriteria } from '~/composables/useAvailability'
 import type { ApiRequestError } from '~/utils/api'
 
-const props = defineProps<{ room: Room; timeSlot: SearchCriteria; error: ApiRequestError | null }>()
+const props = defineProps<{ room: Room; timeSlot: SlotCriteria; error: ApiRequestError | null }>()
 const emit = defineEmits<{ confirm: [bookerName: string]; close: [] }>()
 
 const dialog = useTemplateRef<HTMLDialogElement>('dialog')

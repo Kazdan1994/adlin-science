@@ -20,7 +20,23 @@ export const createBookingRequestSchema = z
   })
   .strict()
 
-export const availableRoomsQuerySchema = z.object({ start: instantSchema, end: instantSchema }).strict()
+// Express parses a repeated query key into an array and a single one into a string.
+const equipmentFilterSchema = z.preprocess(
+  (value) => (typeof value === 'string' ? [value] : value),
+  z
+    .array(z.string().min(1, 'Equipment names cannot be empty.').max(50, 'Equipment names are 50 characters or fewer.'))
+    .max(10, 'Choose at most 10 pieces of equipment.')
+    .refine((items) => new Set(items).size === items.length, 'Each piece of equipment can only be chosen once.'),
+)
+
+export const availableRoomsQuerySchema = z
+  .object({
+    start: instantSchema,
+    end: instantSchema,
+    minCapacity: z.coerce.number().int('Enter a whole number.').min(1, 'Minimum seats must be at least 1.').max(1000, 'Minimum seats must be 1000 or fewer.').optional(),
+    equipment: equipmentFilterSchema.optional(),
+  })
+  .strict()
 
 export const roomSchema = z.object({
   slug: roomSlugSchema,

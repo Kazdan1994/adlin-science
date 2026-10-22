@@ -151,16 +151,16 @@ lists only "Salle nulle"; minimum capacity 30 shows the filtered empty state.
 
 ### Tests for User Story 2 ⚠️ write first, confirm they fail
 
-- [ ] T057 [P] [US2] Extend `packages/shared/tests/schemas.test.ts`: `minCapacity` is an integer "1–1000" (`0`, `1001`, `abc`, `2.5` rejected; `"10"` coerced to 10); `equipment` is "0–10 unique items, each 1–50 chars"; a single `equipment` string becomes a one-item array; duplicates and an 11th item rejected
-- [ ] T058 [P] [US2] Write contract test `apps/api/tests/contract/available-filters.test.ts`: `minCapacity=10` → `salle-2`, `salle-de-ouf`, `salle-okjsdkso`, `salle-nulle`; `equipment=TV` → `salle-1`, `salle-de-ouf`, `salle-nulle`; `equipment=TV&equipment=Retro%20Projecteur&minCapacity=20` → only `salle-nulle`; `minCapacity=30` → `[]`; `equipment=Piano` → 400 `UNKNOWN_EQUIPMENT`; a booked room matching the filters is still excluded
+- [X] T057 [P] [US2] Extend `packages/shared/tests/schemas.test.ts`: `minCapacity` is an integer "1–1000" (`0`, `1001`, `abc`, `2.5` rejected; `"10"` coerced to 10); `equipment` is "0–10 unique items, each 1–50 chars"; a single `equipment` string becomes a one-item array; duplicates and an 11th item rejected
+- [X] T058 [P] [US2] Write contract test `apps/api/tests/contract/available-filters.test.ts`: `minCapacity=10` → `salle-2`, `salle-de-ouf`, `salle-okjsdkso`, `salle-nulle`; `equipment=TV` → `salle-1`, `salle-de-ouf`, `salle-nulle`; `equipment=TV&equipment=Retro%20Projecteur&minCapacity=20` → only `salle-nulle`; `minCapacity=30` → `[]`; `equipment=Piano` → 400 `UNKNOWN_EQUIPMENT`; a booked room matching the filters is still excluded
 
 ### Implementation for User Story 2
 
-- [ ] T059 [US2] Extend `availableRoomsQuerySchema` in `packages/shared/src/schemas.ts` with optional `minCapacity` (coerced integer, 1–1000) and `equipment` (string or string array → array, max 10, unique, each 1–50 chars) so T057 passes
-- [ ] T060 [US2] Extend `apps/api/src/rooms/availability.ts`: reject any `equipment` not in `distinctEquipment()` with `unknownEquipment(names)` (400 `UNKNOWN_EQUIPMENT`); add `capacity: { $gte: minCapacity }` and `equipment: { $all: equipment }` to the room query only when provided, so T058 passes
-- [ ] T061 [P] [US2] Implement `apps/web/app/composables/useRooms.ts`: load `GET /api/rooms` once, expose `equipment` options and the catalogue's max capacity
-- [ ] T062 [US2] Implement `apps/web/app/components/FilterPanel.vue`: "Minimum seats" number input (1–1000, optional) and an equipment checkbox group from `useRooms().equipment`, inside a `<fieldset>` with `<legend>`; "Clear filters" button (depends on T061)
-- [ ] T063 [US2] Add `minCapacity` and `equipment` to the criteria in `apps/web/app/composables/useAvailability.ts`, render `FilterPanel` in `apps/web/app/pages/index.vue`, and switch `EmptyState.vue` copy to "No room matches these filters. Try fewer filters or another time." when filters are active (FR-006)
+- [X] T059 [US2] Extend `availableRoomsQuerySchema` in `packages/shared/src/schemas.ts` with optional `minCapacity` (coerced integer, 1–1000) and `equipment` (string or string array → array, max 10, unique, each 1–50 chars) so T057 passes
+- [X] T060 [US2] Extend `apps/api/src/rooms/availability.ts`: reject any `equipment` not in `distinctEquipment()` with `unknownEquipment(names)` (400 `UNKNOWN_EQUIPMENT`); add `capacity: { $gte: minCapacity }` and `equipment: { $all: equipment }` to the room query only when provided, so T058 passes
+- [X] T061 [P] [US2] Implement `apps/web/app/composables/useRooms.ts`: load `GET /api/rooms` once, expose `equipment` options and the catalogue's max capacity
+- [X] T062 [US2] Implement `apps/web/app/components/FilterPanel.vue`: "Minimum seats" number input (1–1000, optional) and an equipment checkbox group from `useRooms().equipment`, inside a `<fieldset>` with `<legend>`; "Clear filters" button (depends on T061)
+- [X] T063 [US2] Add `minCapacity` and `equipment` to the criteria in `apps/web/app/composables/useAvailability.ts`, render `FilterPanel` in `apps/web/app/pages/index.vue`, and switch `EmptyState.vue` copy to "No room matches these filters. Try fewer filters or another time." when filters are active (FR-006)
 
 **Checkpoint**: US1 and US2 both work; filters never bring back a booked room.
 

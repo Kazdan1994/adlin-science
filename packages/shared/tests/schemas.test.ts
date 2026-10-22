@@ -76,6 +76,44 @@ describe('availableRoomsQuerySchema', () => {
   })
 })
 
+describe('availableRoomsQuerySchema filters', () => {
+  const query = { start: '2026-11-03T09:00:00.000Z', end: '2026-11-03T10:00:00.000Z' }
+  const parse = (extra: object) => availableRoomsQuerySchema.safeParse({ ...query, ...extra })
+
+  it.each(['1', '10', '1000'])('accepts minCapacity %s', (value) => {
+    expect(parse({ minCapacity: value }).success).toBe(true)
+  })
+
+  it('coerces minCapacity from the query string to a number', () => {
+    expect(parse({ minCapacity: '10' }).data?.minCapacity).toBe(10)
+  })
+
+  it.each(['0', '1001', 'abc', '2.5', ''])('rejects minCapacity %j', (value) => {
+    expect(parse({ minCapacity: value }).success).toBe(false)
+  })
+
+  it('turns a single equipment string into a one-item array', () => {
+    expect(parse({ equipment: 'TV' }).data?.equipment).toEqual(['TV'])
+  })
+
+  it('accepts several equipment items', () => {
+    expect(parse({ equipment: ['TV', 'Retro Projecteur'] }).data?.equipment).toEqual(['TV', 'Retro Projecteur'])
+  })
+
+  it('rejects duplicate equipment, an 11th item, and items outside 1-50 characters', () => {
+    const items = Array.from({ length: 11 }, (_, index) => `item-${index}`)
+    expect(parse({ equipment: ['TV', 'TV'] }).success).toBe(false)
+    expect(parse({ equipment: items }).success).toBe(false)
+    expect(parse({ equipment: items.slice(0, 10) }).success).toBe(true)
+    expect(parse({ equipment: [''] }).success).toBe(false)
+    expect(parse({ equipment: ['x'.repeat(51)] }).success).toBe(false)
+  })
+
+  it('rejects an equipment object', () => {
+    expect(parse({ equipment: { $ne: 'x' } }).success).toBe(false)
+  })
+})
+
 describe('errorCodeSchema', () => {
   it('matches the contract enum', () => {
     expect(errorCodeSchema.options).toEqual([
