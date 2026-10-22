@@ -26,7 +26,7 @@ defineExpose({ focus: () => banner.value?.focus() })
     <button
       v-if="retryable"
       type="button"
-      class="h-8 shrink-0 rounded-control border border-negative-ink/30 bg-surface px-3 text-sm font-medium text-negative-ink hover:border-negative-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-negative-ink"
+      class="h-11 shrink-0 sm:h-8 rounded-control border border-negative-ink/30 bg-surface px-3 text-sm font-medium text-negative-ink hover:border-negative-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-negative-ink"
       @click="$emit('retry')"
     >
       Try again

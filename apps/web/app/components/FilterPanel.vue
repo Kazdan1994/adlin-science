@@ -63,7 +63,7 @@ defineExpose({ clear })
       </h2>
       <button
         type="button"
-        class="h-8 rounded-control px-2 text-sm font-medium hover:bg-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary lg:hidden"
+        class="h-11 rounded-control px-2 text-sm font-medium sm:h-8 hover:bg-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary lg:hidden"
         :aria-expanded="open"
         :aria-controls="`${id}-body`"
         @click="open = !open"
@@ -71,7 +71,7 @@ defineExpose({ clear })
         {{ open ? 'Hide filters' : 'Show filters' }}
       </button>
     </div>
-    <fieldset :id="`${id}-body`" :aria-labelledby="`${id}-title`" class="mt-3 space-y-4" :class="open ? 'block' : 'hidden lg:block'">
+    <div :id="`${id}-body`" role="group" :aria-labelledby="`${id}-title`" class="mt-3 space-y-4" :class="open ? 'block' : 'hidden lg:block'">
       <div>
         <label :for="`${id}-seats`" class="text-sm font-medium">Minimum seats</label>
         <input
@@ -96,8 +96,8 @@ defineExpose({ clear })
       </div>
       <fieldset v-if="equipmentOptions.length > 0">
         <legend class="text-sm font-medium">Equipment</legend>
-        <div class="mt-2 grid gap-2">
-          <label v-for="name in equipmentOptions" :key="name" class="flex items-center gap-2.5 text-sm">
+        <div class="mt-1 grid sm:mt-2 sm:gap-2">
+          <label v-for="name in equipmentOptions" :key="name" class="flex min-h-11 items-center gap-2.5 text-sm sm:min-h-0">
             <input
               type="checkbox"
               class="h-4 w-4 accent-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
@@ -116,6 +116,6 @@ defineExpose({ clear })
       >
         Clear filters
       </button>
-    </fieldset>
+    </div>
   </div>
 </template>

@@ -47,10 +47,12 @@ function onSubmit(): void {
   >
     <form novalidate @submit.prevent="onSubmit">
       <h2 :id="titleId" class="text-lg font-semibold">Book {{ room.name }}</h2>
-      <p class="mt-1 text-sm text-muted">
-        {{ formatDay(timeSlot.date) }}, <span class="whitespace-nowrap font-medium text-ink">{{ formatTimeRange(timeSlot.startTime, timeSlot.endTime) }}</span> (Paris time)
-      </p>
       <p class="mt-0.5 text-sm text-muted">{{ roomFacts }}</p>
+
+      <div class="mt-4 rounded-control bg-data-tint px-4 py-3">
+        <p class="text-2xl font-semibold tracking-tight text-data">{{ formatTimeRange(timeSlot.startTime, timeSlot.endTime) }}</p>
+        <p class="mt-0.5 text-sm text-ink">{{ formatDay(timeSlot.date) }} <span class="whitespace-nowrap text-muted">(Paris time)</span></p>
+      </div>
 
       <div class="mt-5">
         <label :for="nameId" class="text-sm font-medium">Your name</label>
@@ -72,12 +74,13 @@ function onSubmit(): void {
 
       <ErrorBanner v-if="bannerError" :code="bannerError.code" class="mt-4" />
 
-      <p class="mt-5 text-sm text-muted">Bookings are final and can't be changed or cancelled.</p>
+      <p class="mt-5 text-sm text-ink">Once confirmed, this slot is yours: no one else can book this room for it.</p>
+      <p class="mt-0.5 text-sm text-muted">Bookings are final and can't be changed or cancelled.</p>
 
       <div class="mt-4 flex justify-end gap-2">
         <button
           type="button"
-          class="h-9 rounded-control border border-control bg-surface px-4 text-sm font-medium hover:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          class="h-11 sm:h-9 rounded-control border border-control bg-surface px-4 text-sm font-medium hover:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           @click="dialog?.close()"
         >
           Cancel
@@ -85,9 +88,10 @@ function onSubmit(): void {
         <button
           type="submit"
           :aria-disabled="submitting"
-          class="h-9 rounded-control bg-primary px-4 text-sm font-medium text-white hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary aria-disabled:cursor-wait aria-disabled:bg-primary-hover"
+          class="h-11 sm:h-9 rounded-control bg-primary px-4 text-sm font-medium text-white hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary aria-disabled:cursor-wait aria-disabled:bg-primary-hover"
         >
-          {{ submitting ? 'Booking…' : 'Confirm booking' }}
+          <template v-if="submitting">Booking…</template>
+          <template v-else>Confirm booking<span class="hidden sm:inline"> · {{ formatTimeRange(timeSlot.startTime, timeSlot.endTime) }}</span></template>
         </button>
       </div>
     </form>
