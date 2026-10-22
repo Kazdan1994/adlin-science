@@ -12,22 +12,30 @@ export const WEB_ORIGIN = 'http://localhost:3000'
 export interface TestApp {
   request: ReturnType<typeof supertest>
   database: Database
-  mongoUri: string
   clearBookings: () => Promise<void>
+  /** Closes this app's Mongo client and starts a new app and client on the same database server. */
+  restart: () => Promise<TestApp>
   stop: () => Promise<void>
 }
+
+export interface TestAppOptions {
+  /** Keep the real 10-per-minute booking limit. Off by default so bulk POST tests do not trip it. */
+  productionRateLimits?: boolean
+}
+
+const RELAXED_BOOKING_LIMIT = 1000
 
 export function bodyOf<T>(response: { body: unknown }): T {
   return response.body as T
 }
 
-export async function startTestApp(): Promise<TestApp> {
+export async function startTestApp(options: TestAppOptions = {}): Promise<TestApp> {
   const mongo = await MongoMemoryServer.create()
-  const mongoUri = mongo.getUri()
-  return buildTestApp(mongo, mongoUri)
+  return buildTestApp(mongo, options)
 }
 
-async function buildTestApp(mongo: MongoMemoryServer, mongoUri: string): Promise<TestApp> {
+async function buildTestApp(mongo: MongoMemoryServer, options: TestAppOptions): Promise<TestApp> {
+  const mongoUri = mongo.getUri()
   const config = loadConfig({ MONGODB_URI: mongoUri, WEB_ORIGIN, LOG_LEVEL: 'silent' })
   const database = await connect(config.mongodbUri, config.mongodbDb)
   await ensureIndexes(database)
@@ -38,14 +46,18 @@ async function buildTestApp(mongo: MongoMemoryServer, mongoUri: string): Promise
     config,
     now: () => FIXED_NOW,
     logger: pino({ level: 'silent' }),
+    ...(options.productionRateLimits ? {} : { bookingRateLimit: RELAXED_BOOKING_LIMIT }),
   })
 
   return {
     request: supertest(app),
     database,
-    mongoUri,
     clearBookings: async () => {
       await database.bookings.deleteMany({})
+    },
+    restart: async () => {
+      await database.client.close()
+      return buildTestApp(mongo, options)
     },
     stop: async () => {
       await database.client.close()

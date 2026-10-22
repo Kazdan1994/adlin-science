@@ -4,6 +4,7 @@ import rateLimit from 'express-rate-limit'
 
 const WINDOW_MS = 60_000
 const GLOBAL_LIMIT_PER_WINDOW = 300
+const BOOKING_LIMIT_PER_WINDOW = 10
 
 const rateLimited: ErrorEnvelope = {
   error: { code: 'RATE_LIMITED', message: 'Too many requests. Please wait a minute and try again.' },
@@ -24,4 +25,8 @@ export function createLimiter(limit: number): RequestHandler {
 
 export function createGlobalLimiter(): RequestHandler {
   return createLimiter(GLOBAL_LIMIT_PER_WINDOW)
+}
+
+export function createBookingLimiter(limit: number = BOOKING_LIMIT_PER_WINDOW): RequestHandler {
+  return createLimiter(limit)
 }
