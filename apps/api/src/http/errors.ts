@@ -29,6 +29,10 @@ export function unknownEquipment(names: readonly string[]): AppError {
   return new AppError(400, 'UNKNOWN_EQUIPMENT', `Unknown equipment: ${names.join(', ')}.`)
 }
 
+export function serviceUnavailable(): AppError {
+  return new AppError(503, 'SERVICE_UNAVAILABLE', 'The service is temporarily unavailable. Please try again shortly.')
+}
+
 export function unsupportedMediaType(): AppError {
   return new AppError(415, 'UNSUPPORTED_MEDIA_TYPE', 'Send the request body as application/json.')
 }
