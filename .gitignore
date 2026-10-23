@@ -11,3 +11,8 @@ test-results/
 .claude/*
 !.claude/skills/
 .claude/settings.local.json
+
+# tool output / third-party skills
+.hallmark/
+.claude/skills/ui-ux-pro-max/
+__pycache__/
