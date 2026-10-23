@@ -61,6 +61,15 @@ const freeCount = computed(() => {
     : `${props.rooms.length} of ${props.roomCount} free`
 })
 
+const hasResult = ref(false)
+watch(() => props.status, (status) => {
+  if (status === 'success') hasResult.value = true
+  else if (status === 'error') hasResult.value = false
+})
+const showSkeleton = computed(() => props.status === 'loading' && !hasResult.value)
+const refreshing = computed(() => props.status === 'loading' && hasResult.value)
+const view = computed(() => (refreshing.value ? 'success' : props.status))
+
 const liveMessage = computed(() => {
   if (props.status !== 'success') return ''
   const count = props.rooms.length
@@ -93,7 +102,7 @@ const liveMessage = computed(() => {
       </div>
     </div>
 
-    <ul v-if="status === 'loading'" class="grid gap-1.5" aria-hidden="true">
+    <ul v-if="showSkeleton" class="grid gap-1.5" aria-hidden="true">
       <li v-for="n in 3" :key="n" class="flex items-center gap-4 bg-surface py-3 pl-3 pr-4 sm:pr-6">
         <div class="size-16 shrink-0 bg-raised sm:size-[5.5rem]" />
         <div class="flex-1 space-y-2">
@@ -103,16 +112,16 @@ const liveMessage = computed(() => {
         <div class="h-11 w-20 bg-raised" />
       </li>
     </ul>
-    <ErrorBanner v-else-if="status === 'error' && error" :code="error.code" retryable @retry="$emit('retry')" />
+    <ErrorBanner v-else-if="view === 'error' && error" :code="error.code" retryable @retry="$emit('retry')" />
     <EmptyState
-      v-else-if="status === 'success' && rooms.length === 0"
+      v-else-if="view === 'success' && rooms.length === 0"
       :filtered="filtered"
       :min-capacity="minCapacity"
       :max-capacity="maxCapacity"
       @clear="$emit('clear')"
       @change-time="$emit('changeTime')"
     />
-    <template v-else-if="status === 'success'">
+    <div v-else-if="view === 'success'" class="results" :class="refreshing && 'is-refreshing'">
       <div class="grid grid-cols-(--grid-room-row) items-center gap-x-4 pb-2 pl-3 pr-4 text-footnote font-semibold text-muted sm:gap-x-6 sm:pr-6 sm:grid-cols-(--grid-room-row-wide)">
         <span aria-hidden="true" />
         <span>Room</span>
@@ -132,10 +141,10 @@ const liveMessage = computed(() => {
         </button>
         <span class="invisible hidden px-5 text-subhead sm:block" aria-hidden="true">Book</span>
       </div>
-      <TransitionGroup tag="ul" name="room" class="grid gap-1.5">
+      <TransitionGroup tag="ul" name="room" class="relative grid gap-1.5">
         <RoomCard v-for="(room, index) in sortedRooms" :key="room.slug" :room="room" :style="{ '--i': index }" @book="$emit('book', $event)" />
       </TransitionGroup>
-    </template>
+    </div>
   </section>
 </template>
 
@@ -153,6 +162,27 @@ const liveMessage = computed(() => {
   transform: translateY(16px);
 }
 
+.room-leave-active {
+  position: absolute;
+  inset-inline: 0;
+  transition:
+    opacity 0.2s ease-out,
+    transform 0.2s ease-out;
+}
+
+.room-leave-to {
+  opacity: 0;
+  transform: scale(0.98);
+}
+
+.results {
+  transition: opacity 0.2s ease-out;
+}
+
+.results.is-refreshing {
+  opacity: 0.6;
+}
+
 .room-move {
   transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -165,7 +195,9 @@ const liveMessage = computed(() => {
 
 @media (prefers-reduced-motion: reduce) {
   .room-enter-active,
+  .room-leave-active,
   .room-move,
+  .results,
   .slot-bar {
     transition: none;
   }

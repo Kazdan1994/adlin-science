@@ -13,11 +13,19 @@ const emit = defineEmits<{ update: [filters: FilterCriteria] }>()
 
 const id = useId()
 const seatsError = ref<string | null>(null)
-const seatsText = ref(props.filters.minCapacity?.toString() ?? '')
+const seatsText = ref(props.filters.minCapacity?.toString() ?? '0')
 const seatsInput = useTemplateRef<HTMLInputElement>('seatsInput')
 const active = computed(() => props.filters.minCapacity !== undefined || props.filters.equipment.length > 0)
 const activeCount = computed(() => (props.filters.minCapacity !== undefined ? 1 : 0) + props.filters.equipment.length)
 const open = ref(false)
+
+const SEATS_DEBOUNCE_MS = 250
+let seatsTimer: ReturnType<typeof setTimeout> | undefined
+function scheduleSeatsChange(): void {
+  clearTimeout(seatsTimer)
+  seatsTimer = setTimeout(onSeatsChange, SEATS_DEBOUNCE_MS)
+}
+onBeforeUnmount(() => clearTimeout(seatsTimer))
 
 function onSeatsChange(): void {
   const raw = seatsText.value.trim()
@@ -42,6 +50,7 @@ function toggleEquipment(name: string, checked: boolean): void {
 }
 
 function clear(): void {
+  clearTimeout(seatsTimer)
   seatsError.value = null
   seatsText.value = ''
   emit('update', { minCapacity: undefined, equipment: [] })
@@ -82,13 +91,12 @@ defineExpose({ clear })
           :min="MIN_SEATS"
           :max="MAX_SEATS"
           step="1"
-          placeholder="Any"
           :value="seatsText"
           class="mt-1.5 block h-11 w-full rounded-control border border-control bg-surface px-3.5 text-body sm:h-10 sm:text-subhead focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-primary aria-invalid:border-negative placeholder:text-muted"
           :aria-invalid="seatsError ? 'true' : undefined"
           :aria-describedby="`${id}-seats-hint`"
           @input="seatsText = ($event.target as HTMLInputElement).value"
-          @change="onSeatsChange"
+          @change="scheduleSeatsChange"
         >
         <p :id="`${id}-seats-hint`" aria-live="polite" class="mt-1.5 text-callout" :class="seatsError ? 'text-negative' : 'text-muted'">
           {{ seatsError ?? (maxCapacity > 0 ? `The largest room seats ${maxCapacity}.` : '') }}

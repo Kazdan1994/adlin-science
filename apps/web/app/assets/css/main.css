@@ -92,6 +92,11 @@
 }
 
 @layer base {
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
+
   html {
     color: var(--color-ink);
     background-color: var(--color-ground);
